@@ -1,1 +1,5 @@
 # AWS-DevOps-MicroServices-FreelaMkt
+
+Freelancer Services Marketplace is a cloud-native web platform that connects clients with freelancers to discover, offer, and manage professional services. Users can create profiles, publish service listings, browse available work, and handle bookings, reviews, and messaging in a centralized system.  
+The application is built with a modern, scalable architecture on AWS, using serverless APIs and managed infrastructure. A Next.js frontend delivers the user experience, while backend microservices handle business logic, authentication, and data processing. Core features include secure user authentication, real-time notifications, file uploads for portfolios, and a relational database to manage users, services, and transactions.  
+Designed with best practices such as infrastructure as code, encryption, and least-privilege access, the platform is optimized for scalability, reliability, and maintainability.
