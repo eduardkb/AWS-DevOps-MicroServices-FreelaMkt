@@ -42,4 +42,4 @@ jobs:
 
       - name: Terraform Apply
         working-directory: terraform/envs/${{ inputs.environment }}/
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -auto-approve
