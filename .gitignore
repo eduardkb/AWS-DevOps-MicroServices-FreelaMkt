@@ -1,0 +1,6 @@
+# Custom
+*terraform-provider*
+*terraform.tfstatete
+*.terraform.lock*
+*.terraform*
+*.vscode*

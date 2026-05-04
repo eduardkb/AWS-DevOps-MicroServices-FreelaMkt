@@ -10,7 +10,10 @@ Items that need to be followed before deploying infrastructure to AWS using Git 
     - Provider type = OpenID Connect
     - Provider URL = https://token.actions.githubusercontent.com
     - Audience = sts.amazonaws.com
-    - Tags = "rg=FreelaMkp-CiCd"
+    - Tags = "rg=FreelaMkp-CiCd; name=GitHub-IdP"
+
+### Create Role and Custom Policy
+
 - Create Role
     - Go to IAM → Roles → Create role
     - Trusted identity type = Web Identity
@@ -50,8 +53,9 @@ Items that need to be followed before deploying infrastructure to AWS using Git 
     - IAM -> Policies -> Create Policy -> JSON
     - Use Policy definition below
     - click next and name policy as "FreelaMkp-GitCiCd-Policy"
-    - Tags = "rg=FreelaMkp-CiCd"
+    - Tags = "rg=FreelaMkp-CiCd; name=FreelaMkp-Policy"
     - Create Policy
+    - Go back to the role and attach this policy to it.
 
 ```Json
 {
@@ -91,20 +95,77 @@ Items that need to be followed before deploying infrastructure to AWS using Git 
     },
     {
       "Sid": "IAMPassRole",
-      "Effect": "Allow",
-      "Action": "iam:PassRole",
-      "Resource": "arn:aws:iam::<AWS_ACCOUNT_D>:role/*"
+        "Effect": "Allow",
+        "Action": "iam:PassRole",
+        "Resource": "arn:aws:iam::<AWS_ACCOUNT_D>:role/github-actions-*",
+        "Condition": {
+            "StringEquals": {
+            "iam:PassedToService": [
+                "ec2.amazonaws.com",
+                "rds.amazonaws.com"
+            ]
+            }
+        }
     }
   ]
 }
 ```
 
-- Configure S3 bucket and DynamoDB table
-    - These are needed to save the terraform state file and do the state file locking respectively.
-    - S3 bucket name:
-    - DynamoDB table name: 
+### Create S3 Bucket for Terraform State File
 
-- Configure Terraform Backend (S3 + Locking)
-    - instructions on ChatGPT
+- Install AWS CLI
+    - choco install awscli
+- Configure Account
+    - $> aws configure
+        - AWS Access Key ID [None]: <SECRET>
+        - AWS Secret Access Key [None]: <SECRET>
+        - AWS Session Token [None]: <SECRET>
+        - Default region name [None]: us-east-1
+        - Default output format [None]: json
+    - Show Account:
+        - $> aws sts get-caller-identity
+- Configure CLI Auto-Completion
+    - Follow instructions: [cli-configure-completion](https://docs.aws.amazon.com/cli/v1/userguide/cli-configure-completion.html)
+    - TAB = auto-complete
+    - CTRL+SPACE = list available commands
+- Create S3
+
+```sh
+aws s3api create-bucket `
+  --bucket freelamkp-tfstate `
+  --region us-east-1
+```
+
+- Secure S3 Bucket
+
+```sh
+aws s3api put-public-access-block `
+  --bucket freelamkp-tfstate `
+  --public-access-block-configuration `
+  BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
+```
+
+- Add tags to S3 Bucket
+
+```sh
+aws s3api put-bucket-tagging `
+  --bucket freelamkp-tfstate `
+  --tagging "TagSet=[{Key=Name,Value=FreelaMkp-TfState},{Key=id,Value=FreelaMkp-CiCd}]"
+```
+
+### Create DynamoDB table for TF state locking
+
+- Create DynamoDB table: 
+
+```sh
+aws dynamodb create-table `
+  --table-name FreelaMkp-terraform-locks `
+  --attribute-definitions AttributeName=LockID,AttributeType=S `
+  --key-schema AttributeName=LockID,KeyType=HASH `
+  --billing-mode PAY_PER_REQUEST `
+  --region us-east-1 `
+  --tags '[{"Key":"Name","Value":"FreelaMkp-TfLock"},{"Key":"id","Value":"FreelaMkp-CiCd"}]'
+```
 
 ###
+
