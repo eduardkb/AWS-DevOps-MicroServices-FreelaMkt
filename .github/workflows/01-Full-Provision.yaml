@@ -1,4 +1,4 @@
-name: Terraform Deploy
+name: 01-Full-Provision
 
 on:
   workflow_dispatch:
@@ -33,6 +33,9 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::217037953500:role/FreelaMkp-GitCiCd-Role
           aws-region: us-east-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
         run: terraform init
