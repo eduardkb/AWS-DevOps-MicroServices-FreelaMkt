@@ -81,6 +81,7 @@ Items that need to be followed before deploying infrastructure to AWS using Git 
         "rds:ModifyDBCluster",
         "rds:DeleteDBCluster",
         "rds:DescribeDBClusters",
+        "rds:DescribeGlobalClusters",
 
         "rds:CreateDBInstance",
         "rds:ModifyDBInstance",
@@ -129,7 +130,7 @@ Items that need to be followed before deploying infrastructure to AWS using Git 
           "iam:AWSServiceName": "rds.amazonaws.com"
         }
       }
-    }
+    },
     {
       "Sid": "IAMPassRole",
         "Effect": "Allow",
