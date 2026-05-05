@@ -3,7 +3,7 @@ terraform {
     bucket         = "freelamkp-tfstate"
     key            = "dev/terraform.tfstate"
     region         = "us-east-1"
-    dynamodb_table = "FreelaMkp-terraform-locks"
+    use_lockfile   = true
     encrypt        = true
   }
 }

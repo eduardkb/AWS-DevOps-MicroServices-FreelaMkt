@@ -153,19 +153,5 @@ aws s3api put-bucket-tagging `
   --tagging "TagSet=[{Key=Name,Value=FreelaMkp-TfState},{Key=id,Value=FreelaMkp-CiCd}]"
 ```
 
-### Create DynamoDB table for TF state locking
-
-- Create DynamoDB table: 
-
-```sh
-aws dynamodb create-table `
-  --table-name FreelaMkp-terraform-locks `
-  --attribute-definitions AttributeName=LockID,AttributeType=S `
-  --key-schema AttributeName=LockID,KeyType=HASH `
-  --billing-mode PAY_PER_REQUEST `
-  --region us-east-1 `
-  --tags '[{"Key":"Name","Value":"FreelaMkp-TfLock"},{"Key":"id","Value":"FreelaMkp-CiCd"}]'
-```
-
 ###
 
