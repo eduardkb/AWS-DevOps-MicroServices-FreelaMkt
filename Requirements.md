@@ -77,8 +77,34 @@ Items that need to be followed before deploying infrastructure to AWS using Git 
       "Sid": "RDSAurora",
       "Effect": "Allow",
       "Action": [
-        "rds:*",
-        "rds-data:*"
+        "rds:CreateDBCluster",
+        "rds:ModifyDBCluster",
+        "rds:DeleteDBCluster",
+        "rds:DescribeDBClusters",
+
+        "rds:CreateDBInstance",
+        "rds:ModifyDBInstance",
+        "rds:DeleteDBInstance",
+        "rds:DescribeDBInstances",
+
+        "rds:CreateDBSubnetGroup",
+        "rds:ModifyDBSubnetGroup",
+        "rds:DeleteDBSubnetGroup",
+        "rds:DescribeDBSubnetGroups",
+
+        "rds:CreateDBClusterParameterGroup",
+        "rds:ModifyDBClusterParameterGroup",
+        "rds:DeleteDBClusterParameterGroup",
+        "rds:DescribeDBClusterParameterGroups",
+
+        "rds:CreateDBParameterGroup",
+        "rds:ModifyDBParameterGroup",
+        "rds:DeleteDBParameterGroup",
+        "rds:DescribeDBParameterGroups",
+
+        "rds:AddTagsToResource",
+        "rds:ListTagsForResource",
+        "rds:RemoveTagsFromResource"
       ],
       "Resource": "*"
     },
@@ -93,6 +119,17 @@ Items that need to be followed before deploying infrastructure to AWS using Git 
       ],
       "Resource": "*"
     },
+    {
+      "Sid": "AllowServiceLinkedRole",
+      "Effect": "Allow",
+      "Action": "iam:CreateServiceLinkedRole",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "iam:AWSServiceName": "rds.amazonaws.com"
+        }
+      }
+    }
     {
       "Sid": "IAMPassRole",
         "Effect": "Allow",
