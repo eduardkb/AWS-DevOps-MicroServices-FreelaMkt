@@ -12,6 +12,16 @@ module "management" {
   shared_tags      = module.global.shared_tags
 }
 
+module "security" {
+  source = "../../modules/security"
+
+  project_initials = module.global.project_initials
+  location         = module.global.location 
+  shared_tags      = module.global.shared_tags
+
+  db_username = var.db_username
+}
+
 module "network" {
   source = "../../modules/netwoek"
 
@@ -27,7 +37,10 @@ module "database" {
   location         = module.global.location
   shared_tags      = module.global.shared_tags
 
-  # From network module outputs
+  # imported from network module
   subnet_group_name      = module.network.subnet_group_name
   rds_security_group_id  = module.network.rds_security_group_id
+
+  # imported from security module
+  postgre_secret = module.security.postgre_secret
 }

@@ -154,6 +154,7 @@ Items that need to be followed before deploying infrastructure to AWS using Git 
         "ec2:CreateTags",
         "ec2:DeleteTags",
         "ec2:DescribeTags",
+				"ec2:DescribeNetworkInterfaces",
 
         "rds:CreateDBSubnetGroup",
         "rds:DeleteDBSubnetGroup",
@@ -162,6 +163,21 @@ Items that need to be followed before deploying infrastructure to AWS using Git 
       ],
       "Resource": "*"
     },
+    {
+      "Sid": "SecretsManagerTerraform",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:CreateSecret",
+        "secretsmanager:DeleteSecret",
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:PutSecretValue",
+        "secretsmanager:UpdateSecret",
+        "secretsmanager:TagResource",
+        "secretsmanager:UntagResource"
+      ],
+      "Resource": "*"
+    }
     {
       "Sid": "AllowServiceLinkedRole",
       "Effect": "Allow",

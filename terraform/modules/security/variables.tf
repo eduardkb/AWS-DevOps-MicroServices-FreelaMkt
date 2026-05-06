@@ -14,16 +14,8 @@ variable "shared_tags" {
   type = map(string)
 }
 
-# from network module
-variable "subnet_group_name" {
-  type = string
-}
-
-variable "rds_security_group_id" {
-  type = string
-}
-
-# from security module
-variable "postgre_secret" {
+# variable from prod env.
+variable "db_username" {
+  description = "Database username"
   type = string
 }
