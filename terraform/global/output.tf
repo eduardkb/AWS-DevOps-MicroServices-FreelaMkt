@@ -3,7 +3,7 @@ output "project_initials" {
 }
 
 output "project_code" {
-  value = substr(md5(timestamp()), 0, 3)
+  value = random_string.rand_suffix.result
 }
 
 output "location" {
