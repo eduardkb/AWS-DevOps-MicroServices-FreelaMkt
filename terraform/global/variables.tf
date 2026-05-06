@@ -18,3 +18,9 @@ variable "shared_tags" {
     "reason" = "Study - Full AWS Microservices Project"
   }
 }
+
+variable "db_username" {
+  description = "Default username for PostgreSQL database"
+  type        = string
+  default     = "pgmaster"
+}
