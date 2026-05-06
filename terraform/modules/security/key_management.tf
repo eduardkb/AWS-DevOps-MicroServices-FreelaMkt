@@ -5,7 +5,6 @@ data "aws_caller_identity" "current" {}
 
 resource "aws_kms_key" "rds_key" {
   description             = "CMK for Aurora PostgreSQL"
-  region                  = var.location
   deletion_window_in_days = 7
   
   policy  = jsonencode({

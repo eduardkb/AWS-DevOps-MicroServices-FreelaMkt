@@ -5,7 +5,6 @@ locals {
 
 resource "aws_rds_cluster" "aurora" {
   cluster_identifier      = "${local.prj_initials}-aurora"
-  region                  = var.location   
   engine                  = "aurora-postgresql"
   engine_mode             = "provisioned"
   # engine_version          = "15.3"
@@ -35,7 +34,6 @@ resource "aws_rds_cluster" "aurora" {
 
 resource "aws_rds_cluster_instance" "aurora_instance" {
   identifier         = lower("${local.prj_initials}-aurora-instance")
-  region             = var.location
   cluster_identifier = aws_rds_cluster.aurora.id
   instance_class     = "db.serverless"
   engine             = aws_rds_cluster.aurora.engine

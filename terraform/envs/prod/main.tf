@@ -7,7 +7,6 @@ module "management" {
 
   project_initials = module.global.project_initials
   project_code     = module.global.project_code
-  location         = module.global.location 
   shared_tags      = module.global.shared_tags
 }
 
@@ -16,7 +15,6 @@ module "security" {
 
   project_initials = module.global.project_initials 
   project_code     = module.global.project_code
-  location         = module.global.location 
   shared_tags      = module.global.shared_tags
   db_username      = module.global.db_username
 }
@@ -26,7 +24,6 @@ module "network" {
 
   project_initials = module.global.project_initials
   project_code     = module.global.project_code
-  location         = module.global.location
   shared_tags      = module.global.shared_tags
 }
 
@@ -35,7 +32,6 @@ module "database" {
 
   project_initials = module.global.project_initials
   project_code     = module.global.project_code
-  location         = module.global.location
   shared_tags      = module.global.shared_tags
 
   # imported from network module

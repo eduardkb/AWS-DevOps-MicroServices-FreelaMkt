@@ -4,12 +4,6 @@ variable "project_initials" {
   default     = "FMkt"
 }
 
-variable "location" {
-  description = "Region for resources"
-  type        = string
-  default     = "us-east-1"
-}
-
 variable "shared_tags" {
   description = "Shared tags for all resources"
   type = map(string)

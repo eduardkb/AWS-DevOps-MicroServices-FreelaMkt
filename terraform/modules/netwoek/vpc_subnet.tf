@@ -5,7 +5,6 @@ locals {
 # VPC
 resource "aws_vpc" "this" {
   cidr_block = "192.168.0.0/16"
-  region     = var.location
 
   tags = merge(
     var.shared_tags,
@@ -19,10 +18,9 @@ resource "aws_vpc" "this" {
 # Private A subnet (internal only)
 resource "aws_subnet" "private_a" {
   vpc_id            = aws_vpc.this.id
-  region            = var.location
   cidr_block        = "192.168.1.0/24"
   map_public_ip_on_launch = false
-  availability_zone = "${var.location}a"
+  availability_zone = "us-east-1a"
 
   tags = merge(
     var.shared_tags,
@@ -36,10 +34,9 @@ resource "aws_subnet" "private_a" {
 # Private B subnet (internal only)
 resource "aws_subnet" "private_b" {
   vpc_id            = aws_vpc.this.id
-  region            = var.location
   cidr_block        = "192.168.2.0/24"
   map_public_ip_on_launch = false
-  availability_zone = "${var.location}b"
+  availability_zone = "us-east-1b"
 
   tags = merge(
     var.shared_tags,
@@ -53,7 +50,6 @@ resource "aws_subnet" "private_b" {
 # Security Group 
 resource "aws_security_group" "rds_sg" {
   name   = "${local.prj_initials}-rds-sg"
-  region = var.location
   vpc_id = aws_vpc.this.id
 
   # allow PostgreSQL from your IP
@@ -84,7 +80,6 @@ resource "aws_security_group" "rds_sg" {
 # DB Subnet Group (REQUIRED for RDS)
 resource "aws_db_subnet_group" "this" {
   name       = "${local.prj_initials}-db-subnet-group"
-  region     = var.location
   subnet_ids = [aws_subnet.private_a.id, aws_subnet.private_b.id]
 
   tags = merge(

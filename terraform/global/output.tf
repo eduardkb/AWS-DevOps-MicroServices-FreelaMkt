@@ -6,10 +6,6 @@ output "project_code" {
   value = random_string.rand_suffix.result
 }
 
-output "location" {
-  value = var.location
-}
-
 output "shared_tags" {
   value = var.shared_tags
 }

@@ -11,7 +11,6 @@ resource "random_password" "postgre_password" {
 # Create the secret container
 resource "aws_secretsmanager_secret" "db_secret" {
   name = "${local.prj_initials_sm}-postgre-credentials"
-  region = var.location
 
   tags = merge(
     var.shared_tags, 
@@ -25,7 +24,6 @@ resource "aws_secretsmanager_secret" "db_secret" {
 # Store the secret value (JSON format recommended by AWS)
 resource "aws_secretsmanager_secret_version" "db_secret_value" {
   secret_id = aws_secretsmanager_secret.db_secret.id
-  region = var.location
   
   secret_string = jsonencode({
     username = var.db_username
