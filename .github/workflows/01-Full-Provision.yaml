@@ -21,7 +21,7 @@ permissions:
   contents: read
 
 jobs:
-  terraform:
+  terraform-apply:
     runs-on: ubuntu-latest
 
     steps:

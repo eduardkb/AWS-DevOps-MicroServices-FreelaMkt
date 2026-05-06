@@ -17,23 +17,23 @@ jobs:
   terraform-destroy:
     runs-on: ubuntu-latest
 
-  steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::217037953500:role/FreelaMkp-GitCiCd-Role
-          aws-region: us-east-1
+        - name: Configure AWS credentials
+          uses: aws-actions/configure-aws-credentials@v4
+          with:
+            role-to-assume: arn:aws:iam::217037953500:role/FreelaMkp-GitCiCd-Role
+            aws-region: us-east-1
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        - name: Setup Terraform
+          uses: hashicorp/setup-terraform@v3
 
-      - name: Terraform Init
-        working-directory: terraform/envs/${{ inputs.environment }}/
-        run: terraform init
+        - name: Terraform Init
+          working-directory: terraform/envs/${{ inputs.environment }}/
+          run: terraform init
 
-      - name: Terraform Destroy
-        working-directory: terraform/envs/${{ inputs.environment }}/
-        run: terraform destroy -auto-approve
+        - name: Terraform Destroy
+          working-directory: terraform/envs/${{ inputs.environment }}/
+          run: terraform destroy -auto-approve
