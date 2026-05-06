@@ -1,11 +1,42 @@
 locals {
   prj_initials_kms = lower("${var.project_initials}-${var.project_code}")
 }
+data "aws_caller_identity" "current" {}
 
 resource "aws_kms_key" "rds_key" {
   description             = "CMK for Aurora PostgreSQL"
   region                  = var.location
   deletion_window_in_days = 7
+  
+  policy  = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid = "EnableRootPermissions"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid = "AllowRDSUsage"
+        Effect = "Allow"
+        Principal = {
+          Service = "rds.amazonaws.com"
+        }
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:GenerateDataKey",
+          "kms:GenerateDataKeyWithoutPlaintext",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
 
   tags = merge(
     var.shared_tags, 

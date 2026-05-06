@@ -135,7 +135,7 @@ Items that need to be followed before deploying infrastructure to AWS using Git 
         "ec2:CreateVpc",
         "ec2:DeleteVpc",
         "ec2:DescribeVpcs",
-        "ec2:DescribeVpcAttribute"
+        "ec2:DescribeVpcAttribute",
         "ec2:ModifyVpcAttribute",
 
         "ec2:CreateSubnet",
@@ -178,7 +178,31 @@ Items that need to be followed before deploying infrastructure to AWS using Git 
         "secretsmanager:UntagResource"
       ],
       "Resource": "*"
-    }
+    },
+    {
+      "Sid": "KMSManagement",
+      "Effect": "Allow",
+      "Action": [
+        "kms:CreateKey",
+        "kms:DescribeKey",
+        "kms:EnableKey",
+        "kms:DisableKey",
+        "kms:ScheduleKeyDeletion",
+        "kms:CancelKeyDeletion",
+        "kms:CreateAlias",
+        "kms:DeleteAlias",
+        "kms:UpdateAlias",
+        "kms:ListAliases",
+        "kms:ListKeys",
+        "kms:TagResource",
+        "kms:UntagResource",
+        "kms:ListResourceTags",
+        "kms:PutKeyPolicy",
+        "kms:GetKeyPolicy",
+        "kms:GetKeyRotationStatus"
+      ],
+      "Resource": "*"
+    },
     {
       "Sid": "AllowServiceLinkedRole",
       "Effect": "Allow",
