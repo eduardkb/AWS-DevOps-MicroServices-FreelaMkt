@@ -74,6 +74,25 @@ Items that need to be followed before deploying infrastructure to AWS using Git 
       "Resource": "*"
     },
     {
+        "Sid": "ResourceGroups",
+        "Effect": "Allow",
+        "Action": [
+            "resource-groups:CreateGroup",
+            "resource-groups:DeleteGroup",
+            "resource-groups:GetGroup",
+            "resource-groups:GetGroupConfiguration",
+            "resource-groups:GetGroupQuery",
+            "resource-groups:UpdateGroup",
+            "resource-groups:UpdateGroupQuery",
+            "resource-groups:ListGroups",
+            "resource-groups:ListGroupResources",
+            "resource-groups:Tag",
+            "resource-groups:GetTags",
+            "resource-groups:Untag"
+        ],
+        "Resource": "*"
+    },
+    {
       "Sid": "RDSAurora",
       "Effect": "Allow",
       "Action": [
