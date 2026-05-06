@@ -10,14 +10,14 @@ resource "random_password" "postgre_password" {
 
 # Create the secret container
 resource "aws_secretsmanager_secret" "db_secret" {
-  name = "${local.prj_initials}-Postgre-credentials"
+  name = "${local.prj_initials}-postgre-credentials"
   region = var.location
 
     tags = merge(
         var.shared_tags, 
         {
-        id          = "${local.prj_initials}-Security"
-        Name        = "${local.prj_initials}-Postgre-credentials"
+        id          = "${local.prj_initials}-security"
+        Name        = "${local.prj_initials}-postgre-credentials"
         }
   )
 }

@@ -14,7 +14,7 @@ resource "aws_resourcegroups_group" "network_group" {
       TagFilters = [
         {
           Key    = "id"
-          Values = ["${local.prj_initials}-Network"]
+          Values = ["${local.prj_initials}-network"]
         }
       ]
     })
@@ -35,7 +35,7 @@ resource "aws_resourcegroups_group" "backend_group" {
       TagFilters = [
         {
           Key    = "id"
-          Values = ["${local.prj_initials}-Backend"]
+          Values = ["${local.prj_initials}-backend"]
         }
       ]
     })
@@ -56,7 +56,7 @@ resource "aws_resourcegroups_group" "security_group" {
       TagFilters = [
         {
           Key    = "id"
-          Values = ["${local.prj_initials}-Security"]
+          Values = ["${local.prj_initials}-security"]
         }
       ]
     })
