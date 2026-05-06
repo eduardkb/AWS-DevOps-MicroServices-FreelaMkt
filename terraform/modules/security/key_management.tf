@@ -31,7 +31,10 @@ resource "aws_kms_key" "rds_key" {
           "kms:Decrypt",
           "kms:GenerateDataKey",
           "kms:GenerateDataKeyWithoutPlaintext",
-          "kms:DescribeKey"
+          "kms:DescribeKey",
+          "kms:CreateGrant",
+          "kms:ListGrants",
+          "kms:RevokeGrant"
         ]
         Resource = "*"
       }
