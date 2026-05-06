@@ -27,11 +27,10 @@ Core Services:
 
 ## Implementation Phases
 
-### Phase 1 - IAM & CI/CD Foundation
+### Phase 1 - IAM & CI/CD Foundation [COMPLETED]
 - Create OIDC provider in AWS for GitHub Actions deployment
 - Configure least-privilege policies
-- Store credentials securely in GitHub Secrets
-- Set up Terraform backend (S3 + DynamoDB for locking)
+- Set up Terraform backend (S3)
 - Create initial GitHub Actions pipeline for Terraform plan/apply
 - Enable CloudTrail to track Terraform changes.
 
@@ -48,7 +47,6 @@ Core Services:
   - bookings
   - reviews
   - messages
-- Apply migrations (via Lambda or CI job)
 
 ---
 

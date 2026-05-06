@@ -3,7 +3,7 @@ locals {
 }
 
 resource "aws_resourcegroups_group" "network_group" {
-  name        = "${local.prj_initials}-network-group"
+  name        = "${local.prj_initials}-network"
   description = "All network resources tagged with FreelaMkp-Network"
   region      = var.location
   resource_query {
@@ -24,7 +24,7 @@ resource "aws_resourcegroups_group" "network_group" {
 }
 
 resource "aws_resourcegroups_group" "backend_group" {
-  name        = "${local.prj_initials}-backend-group"
+  name        = "${local.prj_initials}-backend"
   description = "All backend resources tagged with FreelaMkp-Backend"
   region      = var.location
   resource_query {
@@ -45,7 +45,7 @@ resource "aws_resourcegroups_group" "backend_group" {
 }
 
 resource "aws_resourcegroups_group" "security_group" {
-  name        = "${local.prj_initials}-security-group"
+  name        = "${local.prj_initials}-security"
   description = "All security resources tagged with FreelaMkp-Security"
   region      = var.location
   resource_query {

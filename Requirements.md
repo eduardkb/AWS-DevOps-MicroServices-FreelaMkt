@@ -250,5 +250,9 @@ aws s3api put-bucket-tagging `
   --tagging "TagSet=[{Key=Name,Value=FreelaMkp-TfState},{Key=id,Value=FreelaMkp-CiCd}]"
 ```
 
+### Enable CloudTrail
+
+Enable AWS CloudTrail to have management events sent to S3 bucket. 
+
 ###
 

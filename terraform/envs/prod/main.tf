@@ -43,5 +43,6 @@ module "database" {
   rds_security_group_id  = module.network.rds_security_group_id
 
   # imported from security module
-  postgre_secret = module.security.postgre_secret
+  postgre_secret = module.security.postgre_secret 
+  aws_kms_cmk_arn = module.security.aws_kms_cmk_arn
 }

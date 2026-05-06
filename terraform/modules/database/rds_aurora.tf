@@ -15,6 +15,9 @@ resource "aws_rds_cluster" "aurora" {
   db_subnet_group_name   = var.subnet_group_name
   vpc_security_group_ids = [var.rds_security_group_id]
 
+  storage_encrypted = true
+  kms_key_id        = var.aws_kms_cmk_arn
+
   serverlessv2_scaling_configuration {
     min_capacity = 0
     max_capacity = 1
@@ -24,7 +27,7 @@ resource "aws_rds_cluster" "aurora" {
   tags = merge(
     var.shared_tags, 
     {
-      id          = "${local.prj_initials}-Backend"
+      id          = "${local.prj_initials}-backend"
       Name        = "${local.prj_initials}-aurora"
     }
   )
@@ -39,7 +42,7 @@ resource "aws_rds_cluster_instance" "aurora_instance" {
   tags = merge(
     var.shared_tags,
     {
-      id          = "${local.prj_initials}-Backend"
+      id          = "${local.prj_initials}-backend"
       Name        = "${local.prj_initials}-aurora-instance"
     }
   )

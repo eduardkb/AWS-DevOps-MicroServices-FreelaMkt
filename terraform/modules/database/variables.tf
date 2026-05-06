@@ -32,3 +32,7 @@ variable "rds_security_group_id" {
 variable "postgre_secret" {
   type = string
 }
+
+variable "aws_kms_cmk_arn" {
+  type = string
+}
