@@ -1,5 +1,5 @@
 resource "aws_rds_cluster" "aurora" {
-  cluster_identifier      = lower("${var.project_initials}aurora")
+  cluster_identifier      = lower("${var.project_initials}-aurora")
   region                  = var.location   
   engine                  = "aurora-postgresql"
   engine_mode             = "provisioned"
@@ -19,14 +19,14 @@ resource "aws_rds_cluster" "aurora" {
   tags = merge(
     var.shared_tags, 
     {
-      id          = "FreelaMkp-Backend"
-      Name        = "freelamkt-aurora"
+      id          = "${var.project_initials}-Backend"
+      Name        = "${var.project_initials}-aurora"
     }
   )
 }
 
 resource "aws_rds_cluster_instance" "aurora_instance" {
-  identifier         = lower("${var.project_initials}aurora-instance")
+  identifier         = lower("${var.project_initials}-aurora-instance")
   region             = var.location
   cluster_identifier = aws_rds_cluster.aurora.id
   instance_class     = "db.serverless"
@@ -34,8 +34,8 @@ resource "aws_rds_cluster_instance" "aurora_instance" {
   tags = merge(
     var.shared_tags,
     {
-      id          = "FreelaMkp-Backend"
-      Name        = "freelamkt-aurora-instance"
+      id          = "${var.project_initials}-Backend"
+      Name        = "${var.project_initials}-aurora-instance"
     }
   )
 }

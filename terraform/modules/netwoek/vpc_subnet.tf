@@ -6,8 +6,8 @@ resource "aws_vpc" "this" {
   tags = merge(
     var.shared_tags,
     {
-      id          = "FreelaMkp-Network"
-      Name        = "freelamkt-vpc"
+      id          = "${var.project_initials}-Network"
+      Name        = "${var.project_initials}-vpc"
     }
   )
 }
@@ -22,8 +22,8 @@ resource "aws_subnet" "private_a" {
   tags = merge(
     var.shared_tags,
     {
-      id          = "FreelaMkp-Network"
-      Name        = "freelamkt-private-subnet-a"
+      id          = "${var.project_initials}-Network"
+      Name        = "${var.project_initials}-private-subnet-a"
     }
   )
 }
@@ -38,15 +38,15 @@ resource "aws_subnet" "private_b" {
   tags = merge(
     var.shared_tags,
     {
-      id          = "FreelaMkp-Network"
-      Name        = "freelamkt-private-subnet-b"
+      id          = "${var.project_initials}-Network"
+      Name        = "${var.project_initials}-private-subnet-b"
     }
   )
 }
 
 # Security Group 
 resource "aws_security_group" "rds_sg" {
-  name   = lower("${var.project_initials}rds-sg")
+  name   = lower("${var.project_initials}-rds-sg")
   region = var.location
   vpc_id = aws_vpc.this.id
 
@@ -69,23 +69,23 @@ resource "aws_security_group" "rds_sg" {
   tags = merge(
     var.shared_tags,
     {
-      id          = "FreelaMkp-Network"
-      Name        = "freelamkt-rds-sg"
+      id          = "${var.project_initials}-Network"
+      Name        = "${var.project_initials}-rds-sg"
     }
   )
 }
 
 # DB Subnet Group (REQUIRED for RDS)
 resource "aws_db_subnet_group" "this" {
-  name       = lower("${var.project_initials}db-subnet-group")
+  name       = lower("${var.project_initials}-db-subnet-group")
   region     = var.location
   subnet_ids = [aws_subnet.private_a.id, aws_subnet.private_b.id]
 
   tags = merge(
     var.shared_tags,
     {
-      id          = "FreelaMkp-Network"
-      Name        = "freelamkt-db-subnet-group"
+      id          = "${var.project_initials}-Network"
+      Name        = "${var.project_initials}-db-subnet-group"
     }
   )
 }

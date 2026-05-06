@@ -1,2 +1,2 @@
 - secure RDS password on Secrets Manager
-- create new VPC, new internal subnet and assign RDS's ENI to internal only subnet
+- create resource groups
