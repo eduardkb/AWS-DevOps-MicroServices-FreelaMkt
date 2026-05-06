@@ -13,7 +13,7 @@ module "management" {
 module "security" {
   source = "../../modules/security"
 
-  project_initials = module.global.project_initials 
+  project_initials = module.global.project_initials
   project_code     = module.global.project_code
   shared_tags      = module.global.shared_tags
   db_username      = module.global.db_username
