@@ -171,6 +171,7 @@ Items that need to be followed before deploying infrastructure to AWS using Git 
         "secretsmanager:DeleteSecret",
         "secretsmanager:DescribeSecret",
         "secretsmanager:GetSecretValue",
+        "secretsmanager:GetResourcePolicy",
         "secretsmanager:PutSecretValue",
         "secretsmanager:UpdateSecret",
         "secretsmanager:TagResource",

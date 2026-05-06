@@ -1,3 +1,7 @@
+locals {
+  prj_initials = lower("${var.project_initials}-${var.project_code}")
+}
+
 # Generate a strong random password
 resource "random_password" "postgre_password" {
   length  = 20
@@ -6,14 +10,14 @@ resource "random_password" "postgre_password" {
 
 # Create the secret container
 resource "aws_secretsmanager_secret" "db_secret" {
-  name = "${var.project_initials}-Postgre-credentials"
+  name = "${local.prj_initials}-Postgre-credentials"
   region = var.location
 
     tags = merge(
         var.shared_tags, 
         {
-        id          = "${var.project_initials}-Security"
-        Name        = "${var.project_initials}-Postgre-credentials"
+        id          = "${local.prj_initials}-Security"
+        Name        = "${local.prj_initials}-Postgre-credentials"
         }
   )
 }

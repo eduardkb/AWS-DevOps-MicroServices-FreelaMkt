@@ -1,9 +1,10 @@
 locals {
   postgre_secret = jsondecode(var.postgre_secret)
+  prj_initials = lower("${var.project_initials}-${var.project_code}")
 }
 
 resource "aws_rds_cluster" "aurora" {
-  cluster_identifier      = lower("${var.project_initials}-aurora")
+  cluster_identifier      = "${local.prj_initials}-aurora"
   region                  = var.location   
   engine                  = "aurora-postgresql"
   engine_mode             = "provisioned"
@@ -23,14 +24,14 @@ resource "aws_rds_cluster" "aurora" {
   tags = merge(
     var.shared_tags, 
     {
-      id          = "${var.project_initials}-Backend"
-      Name        = "${var.project_initials}-aurora"
+      id          = "${local.prj_initials}-Backend"
+      Name        = "${local.prj_initials}-aurora"
     }
   )
 }
 
 resource "aws_rds_cluster_instance" "aurora_instance" {
-  identifier         = lower("${var.project_initials}-aurora-instance")
+  identifier         = lower("${local.prj_initials}-aurora-instance")
   region             = var.location
   cluster_identifier = aws_rds_cluster.aurora.id
   instance_class     = "db.serverless"
@@ -38,8 +39,8 @@ resource "aws_rds_cluster_instance" "aurora_instance" {
   tags = merge(
     var.shared_tags,
     {
-      id          = "${var.project_initials}-Backend"
-      Name        = "${var.project_initials}-aurora-instance"
+      id          = "${local.prj_initials}-Backend"
+      Name        = "${local.prj_initials}-aurora-instance"
     }
   )
 }

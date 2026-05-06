@@ -1,3 +1,7 @@
+locals {
+  prj_initials = lower("${var.project_initials}-${var.project_code}")
+}
+
 # VPC
 resource "aws_vpc" "this" {
   cidr_block = "192.168.0.0/16"
@@ -6,8 +10,8 @@ resource "aws_vpc" "this" {
   tags = merge(
     var.shared_tags,
     {
-      id          = "${var.project_initials}-Network"
-      Name        = "${var.project_initials}-vpc"
+      id          = "${local.prj_initials}-Network"
+      Name        = "${local.prj_initials}-vpc"
     }
   )
 }
@@ -22,8 +26,8 @@ resource "aws_subnet" "private_a" {
   tags = merge(
     var.shared_tags,
     {
-      id          = "${var.project_initials}-Network"
-      Name        = "${var.project_initials}-private-subnet-a"
+      id          = "${local.prj_initials}-Network"
+      Name        = "${local.prj_initials}-private-subnet-a"
     }
   )
 }
@@ -38,15 +42,15 @@ resource "aws_subnet" "private_b" {
   tags = merge(
     var.shared_tags,
     {
-      id          = "${var.project_initials}-Network"
-      Name        = "${var.project_initials}-private-subnet-b"
+      id          = "${local.prj_initials}-Network"
+      Name        = "${local.prj_initials}-private-subnet-b"
     }
   )
 }
 
 # Security Group 
 resource "aws_security_group" "rds_sg" {
-  name   = lower("${var.project_initials}-rds-sg")
+  name   = lower("${local.prj_initials}-rds-sg")
   region = var.location
   vpc_id = aws_vpc.this.id
 
@@ -69,23 +73,23 @@ resource "aws_security_group" "rds_sg" {
   tags = merge(
     var.shared_tags,
     {
-      id          = "${var.project_initials}-Network"
-      Name        = "${var.project_initials}-rds-sg"
+      id          = "${local.prj_initials}-Network"
+      Name        = "${local.prj_initials}-rds-sg"
     }
   )
 }
 
 # DB Subnet Group (REQUIRED for RDS)
 resource "aws_db_subnet_group" "this" {
-  name       = lower("${var.project_initials}-db-subnet-group")
+  name       = lower("${local.prj_initials}-db-subnet-group")
   region     = var.location
   subnet_ids = [aws_subnet.private_a.id, aws_subnet.private_b.id]
 
   tags = merge(
     var.shared_tags,
     {
-      id          = "${var.project_initials}-Network"
-      Name        = "${var.project_initials}-db-subnet-group"
+      id          = "${local.prj_initials}-Network"
+      Name        = "${local.prj_initials}-db-subnet-group"
     }
   )
 }

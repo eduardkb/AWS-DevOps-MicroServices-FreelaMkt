@@ -1,7 +1,7 @@
 variable "project_initials" {
   description = "Initials for this project"
   type        = string
-  default     = "FreelaMkt"
+  default     = "FMKT-"
 }
 
 variable "location" {

@@ -4,6 +4,11 @@ variable "project_initials" {
   type        = string
 }
 
+variable "project_code" {
+ description = "Code for this project"
+ type        = string  
+}
+
 variable "location" {
   description = "Region for resources"
   type        = string
