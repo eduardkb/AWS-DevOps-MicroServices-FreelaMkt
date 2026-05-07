@@ -1,5 +1,12 @@
+# Fetch available AZs from the current region automatically
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
 locals {
   prj_initials = lower("${var.project_initials}-${var.project_code}")
+  az_a         = data.aws_availability_zones.available.names[0]
+  az_b         = data.aws_availability_zones.available.names[1]
 }
 
 # VPC
@@ -20,7 +27,7 @@ resource "aws_subnet" "private_a" {
   vpc_id            = aws_vpc.this.id
   cidr_block        = "192.168.1.0/24"
   map_public_ip_on_launch = false
-  availability_zone = "us-east-1a"
+  availability_zone = local.az_a
 
   tags = merge(
     var.shared_tags,
@@ -36,7 +43,7 @@ resource "aws_subnet" "private_b" {
   vpc_id            = aws_vpc.this.id
   cidr_block        = "192.168.2.0/24"
   map_public_ip_on_launch = false
-  availability_zone = "us-east-1b"
+  availability_zone = local.az_b
 
   tags = merge(
     var.shared_tags,

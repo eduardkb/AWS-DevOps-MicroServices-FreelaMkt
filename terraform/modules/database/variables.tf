@@ -31,3 +31,8 @@ variable "postgre_secret" {
 variable "aws_kms_cmk_arn" {
   type = string
 }
+
+variable "aws_kms_key_id" {
+  description = "KMS key ID (used to enforce depends_on ordering)"
+  type        = string
+}

@@ -20,7 +20,7 @@ module "security" {
 }
 
 module "network" {
-  source = "../../modules/netwoek"
+  source = "../../modules/network" 
 
   project_initials = module.global.project_initials
   project_code     = module.global.project_code
@@ -41,4 +41,5 @@ module "database" {
   # imported from security module
   postgre_secret = module.security.postgre_secret 
   aws_kms_cmk_arn = module.security.aws_kms_cmk_arn
+  aws_kms_key_id        = module.security.aws_kms_key_id
 }
