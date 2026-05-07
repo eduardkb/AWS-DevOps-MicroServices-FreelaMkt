@@ -41,5 +41,6 @@ module "database" {
   # imported from security module
   postgre_secret = module.security.postgre_secret 
   aws_kms_cmk_arn = module.security.aws_kms_cmk_arn
-  aws_kms_key_id        = module.security.aws_kms_key_id
+
+  depends_on = [module.security]
 }

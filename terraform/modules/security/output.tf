@@ -6,7 +6,3 @@ output "postgre_secret" {
 output "aws_kms_cmk_arn" {
   value = aws_kms_key.rds_key.arn
 }
-
-output "aws_kms_key_id" {
-  value = aws_kms_key.rds_key.key_id
-}

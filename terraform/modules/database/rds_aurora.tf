@@ -1,7 +1,6 @@
 locals {
   postgre_secret = jsondecode(var.postgre_secret)
   prj_initials = lower("${var.project_initials}-${var.project_code}")
-  _kms_dep       = var.aws_kms_key_id
 }
 
 resource "aws_rds_cluster" "aurora" {
@@ -17,8 +16,6 @@ resource "aws_rds_cluster" "aurora" {
 
   storage_encrypted = true
   kms_key_id        = var.aws_kms_cmk_arn
-
-  depends_on = [var.aws_kms_key_id]   
   
   serverlessv2_scaling_configuration {
     min_capacity = 0
