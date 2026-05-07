@@ -6,6 +6,7 @@ locals {
 resource "random_password" "postgre_password" {
   length  = 20
   special = true
+  override_special = "!#$%&*+?"
 }
 
 # Create the secret container

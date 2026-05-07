@@ -137,6 +137,7 @@ Items that need to be followed before deploying infrastructure to AWS using Git 
         "ec2:DescribeVpcs",
         "ec2:DescribeVpcAttribute",
         "ec2:ModifyVpcAttribute",
+        "ec2:DescribeAvailabilityZones",
 
         "ec2:CreateSubnet",
         "ec2:DeleteSubnet",
