@@ -7,7 +7,7 @@ resource "aws_rds_cluster" "aurora" {
   cluster_identifier      = "${local.prj_initials}-aurora"
   engine                  = "aurora-postgresql"
   engine_mode             = "provisioned"
-  # engine_version          = "15.3"
+  engine_version          = "16.13"
   master_username         = local.postgre_secret["username"]
   master_password         = local.postgre_secret["password"]
   skip_final_snapshot     = true

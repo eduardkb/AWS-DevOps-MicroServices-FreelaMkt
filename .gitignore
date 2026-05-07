@@ -4,3 +4,4 @@
 *.terraform.lock*
 *.terraform*
 *.vscode*
+*.pem
