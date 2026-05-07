@@ -205,6 +205,21 @@ Items that need to be followed before deploying infrastructure to AWS using Git 
       "Resource": "*"
     },
     {
+      "Sid": "KMSGrantForAWSServices",
+      "Effect": "Allow",
+      "Action": [
+        "kms:CreateGrant",
+        "kms:ListGrants",
+        "kms:RevokeGrant"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "Bool": {
+          "kms:GrantIsForAWSResource": "true"
+        }
+      }
+    },
+    {
       "Sid": "AllowServiceLinkedRole",
       "Effect": "Allow",
       "Action": "iam:CreateServiceLinkedRole",
