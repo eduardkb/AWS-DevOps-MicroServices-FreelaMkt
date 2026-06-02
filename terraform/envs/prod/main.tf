@@ -44,3 +44,25 @@ module "database" {
 
   depends_on = [module.security]
 }
+
+module "backend" {
+  source = "../../modules/backend"
+
+  project_initials = module.global.project_initials
+  project_code     = module.global.project_code
+  shared_tags      = module.global.shared_tags
+
+  # from network module
+  lambda_subnet_a_id         = module.network.lambda_subnet_a_id
+  lambda_subnet_b_id         = module.network.lambda_subnet_b_id
+  lambda_security_group_id = module.network.lambda_security_group_id
+
+  # from security module
+  lambda_role_arn = module.security.lambda_migration_role_arn
+  db_secret_arn   = module.security.db_secret_arn
+
+  # from database module
+  aurora_endpoint = module.database.aurora_endpoint
+
+  depends_on = [module.database, module.security, module.network]
+}

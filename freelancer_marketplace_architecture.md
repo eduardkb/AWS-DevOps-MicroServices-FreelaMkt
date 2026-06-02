@@ -42,11 +42,9 @@ Core Services:
 - Store DB credentials in Secrets Manager
 - Enable encryption using KMS
 - Define schema:
-  - users
-  - services
-  - bookings
-  - reviews
-  - messages
+  - Users
+  - Services
+  - Bookings
 
 ---
 
