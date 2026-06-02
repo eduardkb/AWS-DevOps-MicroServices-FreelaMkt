@@ -50,7 +50,16 @@ resource "aws_security_group" "lambda_sg" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = [aws_vpc.this.cidr_block]
+    cidr_blocks = [aws_vpc.this.cidr_block] 
+  }
+
+  # TODO: temporary for migration lambda hanging. correção definitiva é fazer um security group só para os endpoints
+  ingress {
+    description = "HTTPS from self"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    self        = true
   }
 
   tags = merge(
