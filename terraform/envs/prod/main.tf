@@ -58,8 +58,9 @@ module "backend" {
   lambda_security_group_id = module.network.lambda_security_group_id
 
   # from security module
-  lambda_role_arn = module.security.lambda_migration_role_arn
-  db_secret_arn   = module.security.db_secret_arn
+  lambda_migration_role_arn   = module.security.lambda_migration_role_arn
+  lambda_api_role_arn         = module.security.lambda_api_role_arn
+  db_secret_arn               = module.security.db_secret_arn
 
   # from database module
   aurora_endpoint = module.database.aurora_endpoint

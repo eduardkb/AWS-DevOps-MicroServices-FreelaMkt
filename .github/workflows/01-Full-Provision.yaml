@@ -48,12 +48,13 @@ jobs:
       - name: Build psycopg2 layer for Lambda
         run: |
           pip install \
-            --platform manylinux2014_x86_64 \
-            --target db_schema \
+            --platform manylinux2014_x86_64 \            
             --implementation cp \
             --python-version 3.12 \
             --only-binary=:all: \
+            --target terraform/lambda_code/shared_layer/python \
             psycopg2-binary boto3
+            
 
       - name: Terraform Init
         working-directory: terraform/envs/${{ inputs.environment }}/

@@ -2,12 +2,30 @@ locals {
   prj_initials_lmb = lower("${var.project_initials}-${var.project_code}")
 }
 
+# creating a common layer for shared dependencies (psycopg2-binary and boto3) to optimize Lambda package size and deployment time
+data "archive_file" "shared_layer_zip" {
+  type        = "zip"
+  source_dir  = "${path.root}/../../lambda_code/shared_layer"
+  output_path = "${path.module}/shared_layer.zip"
+}
+
+resource "aws_lambda_layer_version" "shared" {
+  layer_name          = "${local.prj_initials_lmb}-shared"
+  filename            = data.archive_file.shared_layer_zip.output_path
+  source_code_hash    = data.archive_file.shared_layer_zip.output_base64sha256
+
+  compatible_runtimes = ["python3.12"]
+}
+
+# Zipped migration code for Lambda function
 data "archive_file" "migration_zip" {
   type        = "zip"
   source_dir  = "${path.root}/../../lambda_code/db_migration"   # relative to envs/prod/
   output_path = "${path.module}/migration_lambda.zip"
 }
 
+
+# Lambda function for database migration
 resource "aws_lambda_function" "db_migration" {
   function_name    = "${local.prj_initials_lmb}-db-migration"
   filename         = data.archive_file.migration_zip.output_path
@@ -16,7 +34,8 @@ resource "aws_lambda_function" "db_migration" {
   runtime          = "python3.12"
   timeout          = 120
   memory_size      = 256
-  role             = var.lambda_role_arn
+  layers           = [aws_lambda_layer_version.shared.arn]
+  role             = var.lambda_migration_role_arn
 
   vpc_config {
     subnet_ids         = [var.lambda_subnet_a_id, var.lambda_subnet_b_id]
