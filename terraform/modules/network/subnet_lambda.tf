@@ -34,6 +34,14 @@ resource "aws_subnet" "private_lambda_b" {
 resource "aws_security_group" "lambda_sg" {
   name   = "${local.prj_initials}-lambda-sg"
   vpc_id = aws_vpc.this.id
+
+  tags = merge(
+    var.shared_tags,
+    {
+      id          = "${local.prj_initials}-network"
+      Name        = "${local.prj_initials}-lambda-sg"
+    }
+  )
 }
 
 # Required so the Lambda can connect to Aurora PostgreSQL
