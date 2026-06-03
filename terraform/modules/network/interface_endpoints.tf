@@ -40,22 +40,6 @@ resource "aws_security_group" "interf_endpoint_sg" {
   name   = "${local.prj_initials}-interfendpoint-sg"
   vpc_id = aws_vpc.this.id
 
-  ingress {
-    description     = "Allow Lambda to reach interface endpoints"
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    security_groups = [aws_security_group.lambda_sg.id]
-  }
-
-  egress {
-    description = "Allow endpoint responses"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   tags = merge(
     var.shared_tags,
     {
@@ -63,4 +47,15 @@ resource "aws_security_group" "interf_endpoint_sg" {
       Name = "${local.prj_initials}-interfendpoint-sg"
     }
   )
+}
+
+# Required so the Interface Endpoints accept HTTPS connections from the Lambda
+resource "aws_security_group_rule" "endpoint_from_lambda" {
+  type                     = "ingress"
+  description              = "Lambda to Interface Endpoints"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.interf_endpoint_sg.id
+  source_security_group_id = aws_security_group.lambda_sg.id
 }

@@ -34,41 +34,26 @@ resource "aws_subnet" "private_lambda_b" {
 resource "aws_security_group" "lambda_sg" {
   name   = "${local.prj_initials}-lambda-sg"
   vpc_id = aws_vpc.this.id
-  
-  # Aurora PostgreSQL
-  egress {
-    description     = "Lambda to RDS Aurora"
-    from_port       = 5432
-    to_port         = 5432
-    protocol        = "tcp"
-    security_groups = [aws_security_group.rds_sg.id]
-  }
-
-  # Secrets Manager + KMS Interface Endpoints
-  egress {
-    description     = "HTTPS to VPC Interface Endpoints"
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    security_groups = [aws_security_group.interf_endpoint_sg.id]
-  }
-
-  tags = merge(
-    var.shared_tags,
-    {
-      id   = "${local.prj_initials}-network"
-      Name = "${local.prj_initials}-lambda-sg"
-    }
-  )
 }
 
-# Allow the Lambda SG to reach Aurora — add an ingress rule on the RDS SG
-resource "aws_security_group_rule" "rds_from_lambda" {
-  type                     = "ingress"
-  description              = "Allow Lambda migration function to reach Aurora"
+# Required so the Lambda can connect to Aurora PostgreSQL
+resource "aws_security_group_rule" "lambda_to_rds" {
+  type                     = "egress"
+  description              = "Lambda to Aurora PostgreSQL"
   from_port                = 5432
   to_port                  = 5432
   protocol                 = "tcp"
-  security_group_id        = aws_security_group.rds_sg.id
-  source_security_group_id = aws_security_group.lambda_sg.id
+  security_group_id        = aws_security_group.lambda_sg.id
+  source_security_group_id = aws_security_group.rds_sg.id
+}
+
+# Required so the Lambda can call Secrets Manager and KMS through VPC Interface Endpoints over HTTPS
+resource "aws_security_group_rule" "lambda_https_outbound" {
+  type              = "egress"
+  description       = "Lambda HTTPS outbound"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  security_group_id = aws_security_group.lambda_sg.id
+  cidr_blocks       = ["0.0.0.0/0"]
 }

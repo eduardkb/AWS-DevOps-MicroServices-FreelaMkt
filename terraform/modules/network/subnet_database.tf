@@ -35,22 +35,6 @@ resource "aws_security_group" "rds_sg" {
   name   = "${local.prj_initials}-rds-sg"
   vpc_id = aws_vpc.this.id
 
-  # allow PostgreSQL from your IP
-  # ingress {
-  #   from_port   = 5432
-  #   to_port     = 5432
-  #   protocol    = "tcp"
-  #   cidr_blocks = ["179.186.231.0/24"]
-  # }
-
-  # Required: allow outbound (AWS requirement for RDS)
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   tags = merge(
     var.shared_tags,
     {
@@ -58,6 +42,17 @@ resource "aws_security_group" "rds_sg" {
       Name        = "${local.prj_initials}-rds-sg"
     }
   )
+}
+
+# Required so Aurora accepts PostgreSQL connections from the Lambda
+resource "aws_security_group_rule" "rds_from_lambda" {
+  type                     = "ingress"
+  description              = "Lambda to Aurora PostgreSQL"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.rds_sg.id
+  source_security_group_id = aws_security_group.lambda_sg.id
 }
 
 # RDS DB Subnet Group (REQUIRED for RDS)

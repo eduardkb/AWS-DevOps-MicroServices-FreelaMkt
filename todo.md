@@ -1,2 +1,1 @@
 - are there NACL's deployed with base deploy?
-- fix terraform destroy permission issue.
