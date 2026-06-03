@@ -1,219 +1,64 @@
 {
   "Version": "2012-10-17",
   "Statement": [
+
     {
-      "Sid": "TerraformState",
+      "Sid": "TerraformServices",
       "Effect": "Allow",
       "Action": [
-        "s3:CreateBucket",
-        "s3:ListBucket",
-        "s3:GetObject",
-        "s3:PutObject",
-        "s3:DeleteObject"
+        "ec2:*",
+        "rds:*",
+        "lambda:*",
+        "logs:*",
+        "kms:*",
+        "secretsmanager:*",
+        "s3:*",
+        "resource-groups:*"
       ],
       "Resource": "*"
     },
+
     {
-      "Sid": "ResourceGroups",
+      "Sid": "TerraformIAM",
       "Effect": "Allow",
       "Action": [
-        "resource-groups:CreateGroup",
-        "resource-groups:DeleteGroup",
-        "resource-groups:GetGroup",
-        "resource-groups:GetGroupConfiguration",
-        "resource-groups:GetGroupQuery",
-        "resource-groups:UpdateGroup",
-        "resource-groups:UpdateGroupQuery",
-        "resource-groups:ListGroups",
-        "resource-groups:ListGroupResources",
-        "resource-groups:Tag",
-        "resource-groups:GetTags",
-        "resource-groups:Untag"
-      ],
-      "Resource": "*"
+  		"iam:CreateRole",
+	    "iam:DeleteRole",
+	    "iam:GetRole",
+	    "iam:UpdateRole",
+	    "iam:TagRole",
+	    "iam:UntagRole",
+	
+	    "iam:AttachRolePolicy",
+	    "iam:DetachRolePolicy",
+	
+	    "iam:PutRolePolicy",
+	    "iam:DeleteRolePolicy",
+	    "iam:GetRolePolicy",
+	    "iam:ListRolePolicies",
+	    "iam:ListAttachedRolePolicies"
+      	],
+      "Resource": "arn:aws:iam::217037953500:role/*"
     },
+
     {
-      "Sid": "RDSAurora",
+      "Sid": "TerraformPassRole",
       "Effect": "Allow",
-      "Action": [
-        "rds:CreateDBCluster",
-        "rds:ModifyDBCluster",
-        "rds:DeleteDBCluster",
-        "rds:DescribeDBClusters",
-        "rds:DescribeGlobalClusters",
-        "rds:CreateDBInstance",
-        "rds:ModifyDBInstance",
-        "rds:DeleteDBInstance",
-        "rds:DescribeDBInstances",
-        "rds:CreateDBSubnetGroup",
-        "rds:ModifyDBSubnetGroup",
-        "rds:DeleteDBSubnetGroup",
-        "rds:DescribeDBSubnetGroups",
-        "rds:CreateDBClusterParameterGroup",
-        "rds:ModifyDBClusterParameterGroup",
-        "rds:DeleteDBClusterParameterGroup",
-        "rds:DescribeDBClusterParameterGroups",
-        "rds:CreateDBParameterGroup",
-        "rds:ModifyDBParameterGroup",
-        "rds:DeleteDBParameterGroup",
-        "rds:DescribeDBParameterGroups",
-        "rds:AddTagsToResource",
-        "rds:ListTagsForResource",
-        "rds:RemoveTagsFromResource"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Sid": "Networking",
-      "Effect": "Allow",
-      "Action": [
-        "ec2:CreateVpc",
-        "ec2:DeleteVpc",
-        "ec2:DescribeVpcs",
-        "ec2:DescribeVpcAttribute",
-        "ec2:ModifyVpcAttribute",
-        "ec2:CreateSubnet",
-        "ec2:DeleteSubnet",
-        "ec2:DescribeSubnets",
-        "ec2:ModifySubnetAttribute",
-        "ec2:DescribeRouteTables",
-        "ec2:DescribeInternetGateways",
-        "ec2:DescribeVpcEndpoints",
-        "ec2:DescribeVpcEndpointServices",
-        "ec2:CreateVpcEndpoint",
-        "ec2:ModifyVpcEndpoint",
-        "ec2:DeleteVpcEndpoints",
-        "ec2:CreateSecurityGroup",
-        "ec2:DeleteSecurityGroup",
-        "ec2:DescribeSecurityGroups",
-        "ec2:AuthorizeSecurityGroupIngress",
-        "ec2:AuthorizeSecurityGroupEgress",
-        "ec2:RevokeSecurityGroupIngress",
-        "ec2:RevokeSecurityGroupEgress",
-        "ec2:CreateTags",
-        "ec2:DeleteTags",
-        "ec2:DescribeTags",
-        "ec2:CreateNetworkInterface",
-        "ec2:DeleteNetworkInterface",
-        "ec2:DetachNetworkInterface",
-        "ec2:DescribeNetworkInterfaces",
-        "ec2:DescribeAvailabilityZones"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Sid": "LambdaManagement",
-      "Effect": "Allow",
-      "Action": [
-        "lambda:CreateFunction",
-        "lambda:DeleteFunction",
-        "lambda:GetFunction",
-        "lambda:GetFunctionConfiguration",
-        "lambda:UpdateFunctionCode",
-        "lambda:UpdateFunctionConfiguration",
-        "lambda:PublishVersion",
-        "lambda:ListVersionsByFunction",
-        "lambda:AddPermission",
-        "lambda:RemovePermission",
-        "lambda:TagResource",
-        "lambda:UntagResource",
-        "lambda:ListTags",
-        "lambda:InvokeFunction"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Sid": "CloudWatchLogs",
-      "Effect": "Allow",
-      "Action": [
-        "logs:CreateLogGroup",
-        "logs:DeleteLogGroup",
-        "logs:DescribeLogGroups",
-        "logs:PutRetentionPolicy",
-        "logs:DeleteRetentionPolicy",
-        "logs:TagResource",
-        "logs:UntagResource",
-        "logs:ListTagsForResource"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Sid": "SecretsManagerTerraform",
-      "Effect": "Allow",
-      "Action": [
-        "secretsmanager:CreateSecret",
-        "secretsmanager:DeleteSecret",
-        "secretsmanager:DescribeSecret",
-        "secretsmanager:GetSecretValue",
-        "secretsmanager:GetResourcePolicy",
-        "secretsmanager:PutSecretValue",
-        "secretsmanager:UpdateSecret",
-        "secretsmanager:TagResource",
-        "secretsmanager:UntagResource"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Sid": "KMSManagement",
-      "Effect": "Allow",
-      "Action": [
-        "kms:CreateKey",
-        "kms:DescribeKey",
-        "kms:EnableKey",
-        "kms:DisableKey",
-        "kms:ScheduleKeyDeletion",
-        "kms:CancelKeyDeletion",
-        "kms:CreateAlias",
-        "kms:DeleteAlias",
-        "kms:UpdateAlias",
-        "kms:ListAliases",
-        "kms:ListKeys",
-        "kms:TagResource",
-        "kms:UntagResource",
-        "kms:ListResourceTags",
-        "kms:PutKeyPolicy",
-        "kms:GetKeyPolicy",
-        "kms:GetKeyRotationStatus"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Sid": "KMSGrantForAWSServices",
-      "Effect": "Allow",
-      "Action": [
-        "kms:CreateGrant",
-        "kms:ListGrants",
-        "kms:RevokeGrant"
-      ],
-      "Resource": "*",
+      "Action": "iam:PassRole",
+      "Resource": "arn:aws:iam::217037953500:role/*",
       "Condition": {
-        "Bool": {
-          "kms:GrantIsForAWSResource": "true"
+        "StringEquals": {
+          "iam:PassedToService": [
+            "lambda.amazonaws.com",
+            "ec2.amazonaws.com",
+            "rds.amazonaws.com"
+          ]
         }
       }
     },
+
     {
-      "Sid": "IAMRoleManagement",
-      "Effect": "Allow",
-      "Action": [
-        "iam:CreateRole",
-        "iam:DeleteRole",
-        "iam:GetRole",
-        "iam:UpdateRole",
-        "iam:AttachRolePolicy",
-        "iam:DetachRolePolicy",
-        "iam:PutRolePolicy",
-        "iam:DeleteRolePolicy",
-        "iam:GetRolePolicy",
-        "iam:ListAttachedRolePolicies",
-        "iam:ListRolePolicies",
-        "iam:TagRole",
-        "iam:UntagRole"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Sid": "AllowServiceLinkedRole",
+      "Sid": "ServiceLinkedRoles",
       "Effect": "Allow",
       "Action": "iam:CreateServiceLinkedRole",
       "Resource": "*",
@@ -225,40 +70,6 @@
           ]
         }
       }
-    },
-    {
-      "Sid": "ReadOnlyDiscovery",
-      "Effect": "Allow",
-      "Action": [
-        "ec2:Describe*",
-        "iam:Get*",
-        "iam:List*",
-        "kms:List*",
-        "kms:Describe*",
-        "rds:Describe*",
-        "logs:Describe*",
-        "lambda:Get*",
-        "lambda:List*",
-        "secretsmanager:Describe*",
-        "secretsmanager:List*"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Sid": "IAMPassRole",
-      "Effect": "Allow",
-      "Action": "iam:PassRole",      
-      "Resource": "arn:aws:iam::217037953500:role/*",
-      "Condition": {
-        "StringEquals": {
-          "iam:PassedToService": [
-            "lambda.amazonaws.com",
-            "ecs-tasks.amazonaws.com",
-            "ec2.amazonaws.com",
-            "rds.amazonaws.com"
-          ]
-        }
-      }
-    }    
+    }
   ]
 }
