@@ -34,32 +34,23 @@ resource "aws_subnet" "private_lambda_b" {
 resource "aws_security_group" "lambda_sg" {
   name   = "${local.prj_initials}-lambda-sg"
   vpc_id = aws_vpc.this.id
-
-  # Lambda needs to call Aurora (PostgreSQL) — outbound only
+  
+  # Aurora PostgreSQL
   egress {
-    description     = "PostgreSQL to Aurora"
+    description     = "Lambda to RDS Aurora"
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
     security_groups = [aws_security_group.rds_sg.id]
   }
 
-  # Lambda needs to call AWS service endpoints (Secrets Manager, KMS)
+  # Secrets Manager + KMS Interface Endpoints
   egress {
-    description = "HTTPS to VPC endpoints"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = [aws_vpc.this.cidr_block] 
-  }
-
-  # TODO: temporary for migration lambda hanging. correção definitiva é fazer um security group só para os endpoints
-  ingress {
-    description = "HTTPS from self"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    self        = true
+    description     = "HTTPS to VPC Interface Endpoints"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = [aws_security_group.interf_endpoint_sg.id]
   }
 
   tags = merge(

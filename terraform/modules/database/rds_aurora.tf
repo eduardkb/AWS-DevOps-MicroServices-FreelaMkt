@@ -11,8 +11,9 @@ resource "aws_rds_cluster" "aurora" {
   master_username         = local.postgre_secret["username"]
   master_password         = local.postgre_secret["password"]
   skip_final_snapshot     = true
-  db_subnet_group_name   = var.subnet_group_name
-  vpc_security_group_ids = [var.rds_security_group_id]
+  db_subnet_group_name    = var.subnet_group_name
+  vpc_security_group_ids  = [var.rds_security_group_id]
+  database_name           = "freelamktdb"
 
   storage_encrypted = true
   kms_key_id        = var.aws_kms_cmk_arn

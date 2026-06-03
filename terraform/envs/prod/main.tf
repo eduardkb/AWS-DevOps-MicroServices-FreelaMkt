@@ -63,6 +63,8 @@ module "backend" {
 
   # from database module
   aurora_endpoint = module.database.aurora_endpoint
+  aurora_port     = module.database.aurora_port
+  aurora_name     = module.database.aurora_name
 
   depends_on = [module.database, module.security, module.network]
 }

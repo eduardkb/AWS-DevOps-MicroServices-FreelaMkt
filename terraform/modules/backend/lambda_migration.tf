@@ -26,6 +26,9 @@ resource "aws_lambda_function" "db_migration" {
   environment {
     variables = {
       DB_SECRET_ARN = var.db_secret_arn
+      DB_HOST       = var.aurora_endpoint
+      DB_PORT       = var.aurora_port
+      DB_NAME       = var.aurora_name
     }
   }
 

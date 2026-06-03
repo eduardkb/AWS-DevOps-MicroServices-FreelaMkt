@@ -36,12 +36,12 @@ resource "aws_security_group" "rds_sg" {
   vpc_id = aws_vpc.this.id
 
   # allow PostgreSQL from your IP
-  ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = ["179.186.231.0/24"]
-  }
+  # ingress {
+  #   from_port   = 5432
+  #   to_port     = 5432
+  #   protocol    = "tcp"
+  #   cidr_blocks = ["179.186.231.0/24"]
+  # }
 
   # Required: allow outbound (AWS requirement for RDS)
   egress {

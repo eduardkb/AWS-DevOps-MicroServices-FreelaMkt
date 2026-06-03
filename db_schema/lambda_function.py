@@ -31,13 +31,13 @@ def handler(event, context):
     secret = get_secret()
 
     logger.info(
-        f"Connecting to database host={secret['host']} port={secret['port']} db={secret['database']}"
+        f"Connecting to database host={secret['DB_HOST']} port={secret['DB_PORT']} db={secret['DB_NAME']}"
     )
 
     connection = psycopg2.connect(
-        host=secret["host"],
-        port=secret["port"],
-        dbname=secret["database"],
+        host=secret["DB_HOST"],
+        port=secret["DB_PORT"],
+        dbname=secret["DB_NAME"],
         user=secret["username"],
         password=secret["password"],
         connect_timeout=10
