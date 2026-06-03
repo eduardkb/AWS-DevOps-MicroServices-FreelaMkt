@@ -246,6 +246,6 @@ def delete_service(service_id: str):
 # ============================================================
 
 @logger.inject_lambda_context
-def lambda_handler(event, context):
+def handler(event, context):
     logger.info("Services API request received")
     return app.resolve(event, context)

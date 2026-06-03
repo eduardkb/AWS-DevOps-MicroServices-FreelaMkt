@@ -44,8 +44,8 @@ jobs:
         with:
           terraform_wrapper: false   # needed so outputs are clean strings
 
-      # Build psycopg2 for Amazon Linux 2023 before Terraform packages the zip
-      - name: Build psycopg2 layer for Lambda
+      # Build dependencies for Amazon Linux 2023 before Terraform packages the zip
+      - name: Build dependencies layer for all Lambda functions
         run: |
           pip install \
             --platform manylinux2014_x86_64 \
