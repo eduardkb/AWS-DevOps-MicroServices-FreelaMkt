@@ -38,7 +38,7 @@ Items that need to be followed before deploying infrastructure to AWS using Git 
 
 ### Create S3 Bucket for Terraform State File
 
-- Install AWS CLI
+- Install AWS CLIO
     - choco install awscli
 - Configure Account
     - $> aws configure

@@ -33,10 +33,6 @@ def handler(event, context):
     logger.info(
         f"Connecting to database host={os.environ['DB_HOST']} port={os.environ['DB_PORT']} db={os.environ['DB_NAME']}"
     )
-    # TODO: delete line below!!!!!!!!!
-    logger.info(
-        f"database usr={secret['username']} pass={secret['password']}"
-    )
 
     connection = psycopg2.connect(
         host=os.environ["DB_HOST"],
@@ -44,7 +40,7 @@ def handler(event, context):
         dbname=os.environ["DB_NAME"],
         user=secret["username"],
         password=secret["password"],
-        connect_timeout=60
+        connect_timeout=30
     )
 
     logger.info("Database connected")

@@ -4,7 +4,7 @@ locals {
 
 data "archive_file" "migration_zip" {
   type        = "zip"
-  source_dir  = "${path.root}/../../../db_schema"   # relative to envs/prod/
+  source_dir  = "${path.root}/../../lambda_code/db_migration"   # relative to envs/prod/
   output_path = "${path.module}/migration_lambda.zip"
 }
 

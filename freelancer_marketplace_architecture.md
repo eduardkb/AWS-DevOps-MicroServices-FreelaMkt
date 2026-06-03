@@ -36,7 +36,7 @@ Core Services:
 
 ---
 
-### Phase 2 - Database Layer (Aurora PostgreSQL)
+### Phase 2 - Database Layer (Aurora PostgreSQL) [COMPLETED]
 - Provision Aurora PostgreSQL cluster
 - Configure subnet groups and security groups
 - Store DB credentials in Secrets Manager
@@ -45,6 +45,7 @@ Core Services:
   - Users
   - Services
   - Bookings
+- Deploy lambda migration function that initializes tables
 
 ---
 
