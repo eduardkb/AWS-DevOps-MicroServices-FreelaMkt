@@ -48,7 +48,7 @@ jobs:
       - name: Build psycopg2 layer for Lambda
         run: |
           pip install \
-            --platform manylinux2014_x86_64 \            
+            --platform manylinux2014_x86_64 \
             --implementation cp \
             --python-version 3.12 \
             --only-binary=:all: \
