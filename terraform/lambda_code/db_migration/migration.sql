@@ -71,10 +71,10 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM bookings) THEN
         INSERT INTO bookings (id, service_id, buyer_user_id, booking_date, status, created_at)
         VALUES
-        ('ccccccc1-bbbb-bbbb-bbbb-bbbbbbbbbbb1', 'bbbbbbb1-aaaa-aaaa-aaaa-aaaaaaaaaaa1', 'aaaaaaa1-2222-2222-2222-222222222222', NOW(), 'confirmed', CURRENT_TIMESTAMP),
-        ('ccccccc2-bbbb-bbbb-bbbb-bbbbbbbbbbb2', 'bbbbbbb2-aaaa-aaaa-aaaa-aaaaaaaaaaa2', 'aaaaaaa2-3333-3333-3333-333333333333', NOW(), 'pending', CURRENT_TIMESTAMP),
-        ('ccccccc3-bbbb-bbbb-bbbb-bbbbbbbbbbb3', 'bbbbbbb3-aaaa-aaaa-aaaa-aaaaaaaaaaa3', 'aaaaaaa3-4444-4444-4444-444444444444', NOW(), 'confirmed', CURRENT_TIMESTAMP),
-        ('ccccccc4-bbbb-bbbb-bbbb-bbbbbbbbbbb4', 'bbbbbbb4-aaaa-aaaa-aaaa-aaaaaaaaaaa4', 'aaaaaaa4-5555-5555-5555-555555555555', NOW(), 'cancelled', CURRENT_TIMESTAMP),
-        ('ccccccc5-bbbb-bbbb-bbbb-bbbbbbbbbbb5', 'bbbbbbb5-aaaa-aaaa-aaaa-aaaaaaaaaaa5', 'aaaaaaa5-1111-1111-1111-111111111111', NOW(), 'pending', CURRENT_TIMESTAMP);
+        ('ccccccc1-bbbb-bbbb-bbbb-bbbbbbbbbbb1', 'bbbbbbb1-aaaa-aaaa-aaaa-aaaaaaaaaaa1', 'aaaaaaa1-1111-1111-1111-111111111111', NOW(), 'confirmed', CURRENT_TIMESTAMP),
+        ('ccccccc2-bbbb-bbbb-bbbb-bbbbbbbbbbb2', 'bbbbbbb2-aaaa-aaaa-aaaa-aaaaaaaaaaa2', 'aaaaaaa2-2222-2222-2222-222222222222', NOW(), 'pending', CURRENT_TIMESTAMP),
+        ('ccccccc3-bbbb-bbbb-bbbb-bbbbbbbbbbb3', 'bbbbbbb3-aaaa-aaaa-aaaa-aaaaaaaaaaa3', 'aaaaaaa3-3333-3333-3333-333333333333', NOW(), 'confirmed', CURRENT_TIMESTAMP),
+        ('ccccccc4-bbbb-bbbb-bbbb-bbbbbbbbbbb4', 'bbbbbbb4-aaaa-aaaa-aaaa-aaaaaaaaaaa4', 'aaaaaaa4-4444-4444-4444-444444444444', NOW(), 'cancelled', CURRENT_TIMESTAMP),
+        ('ccccccc5-bbbb-bbbb-bbbb-bbbbbbbbbbb5', 'bbbbbbb5-aaaa-aaaa-aaaa-aaaaaaaaaaa5', 'aaaaaaa5-5555-5555-5555-555555555555', NOW(), 'pending', CURRENT_TIMESTAMP);
     END IF;
 END $$;
