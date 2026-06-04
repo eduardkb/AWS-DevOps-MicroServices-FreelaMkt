@@ -30,7 +30,7 @@ Here's a complete AWS infrastructure design based on your implementation plan, i
 
                ┌──────────────────────┐  ┌──────────────────────┐
                │   ECS Fargate        │  │   Lambda Services    │
-               │   Next.js Frontend   │  │                      │
+               │   Frontend           │  │                      │
                │                      │  │ • User Service       │
                │ Auto Scaling         │  │ • Marketplace        │
                │ Task Definitions     │  │ • Booking Service    │

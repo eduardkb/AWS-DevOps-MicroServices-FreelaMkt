@@ -5,7 +5,7 @@
 # zip the users API code for Lambda function
 data "archive_file" "users_api_zip" {
   type        = "zip"
-  source_dir  = "${path.root}/../../lambda_code/users_api"   # relative to envs/prod/
+  source_dir  = "${path.root}/../../../backend_API/users_api_lambda"   # relative to envs/prod/
   output_path = "${path.module}/users_api.zip"
 }
 
@@ -50,7 +50,7 @@ resource "aws_lambda_function" "users_api" {
 # zip the services API code for Lambda function
 data "archive_file" "services_api_zip" {
   type        = "zip"
-  source_dir  = "${path.root}/../../lambda_code/services_api"   # relative to envs/prod/
+  source_dir  = "${path.root}/../../../backend_API/services_api_lambda"   # relative to envs/prod/
   output_path = "${path.module}/services_api.zip"
 }
 
@@ -95,7 +95,7 @@ resource "aws_lambda_function" "services_api" {
 # zip the bookings API code for Lambda function
 data "archive_file" "bookings_api_zip" {
   type        = "zip"
-  source_dir  = "${path.root}/../../lambda_code/bookings_api"   # relative to envs/prod/
+  source_dir  = "${path.root}/../../../backend_API/bookings_api_lambda"   # relative to envs/prod/
   output_path = "${path.module}/bookings_api.zip"
 }
 

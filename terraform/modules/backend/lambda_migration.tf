@@ -5,7 +5,7 @@ locals {
 # creating a common layer for shared dependencies (psycopg2-binary and boto3) to optimize Lambda package size and deployment time
 data "archive_file" "shared_layer_zip" {
   type        = "zip"
-  source_dir  = "${path.root}/../../lambda_code/shared_layer"
+  source_dir  = "${path.root}/../../../backend_API/shared_layer"
   output_path = "${path.module}/shared_layer.zip"
 }
 
@@ -20,7 +20,7 @@ resource "aws_lambda_layer_version" "shared" {
 # Zipped migration code for Lambda function
 data "archive_file" "migration_zip" {
   type        = "zip"
-  source_dir  = "${path.root}/../../lambda_code/db_migration"   # relative to envs/prod/
+  source_dir  = "${path.root}/../../../backend_API/db_migration_lambda"   # relative to envs/prod/
   output_path = "${path.module}/migration_lambda.zip"
 }
 

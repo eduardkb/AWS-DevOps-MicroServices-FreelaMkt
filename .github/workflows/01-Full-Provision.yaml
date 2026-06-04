@@ -52,7 +52,7 @@ jobs:
             --implementation cp \
             --python-version 3.12 \
             --only-binary=:all: \
-            --target terraform/lambda_code/shared_layer/python \
+            --target backend_API/shared_layer/python \
             psycopg2-binary boto3 \
             aws-lambda-powertools
             
