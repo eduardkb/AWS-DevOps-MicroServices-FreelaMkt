@@ -13,7 +13,8 @@
         "kms:*",
         "secretsmanager:*",
         "s3:*",
-        "resource-groups:*"
+        "resource-groups:*",
+        "apigateway:*"
       ],
       "Resource": "*"
     },

@@ -3,7 +3,7 @@
 ############################
 
 resource "aws_apigatewayv2_api" "http_api" {
-  name          = "main-http-api"
+  name          = "${local.prj_initials_lmb}-API-Gateway"
   protocol_type = "HTTP"
 
   cors_configuration {
@@ -11,6 +11,14 @@ resource "aws_apigatewayv2_api" "http_api" {
     allow_methods = ["GET", "POST", "PUT", "DELETE"]
     allow_headers = ["*"]
   }
+
+  tags = merge(
+    var.shared_tags,
+    {
+      id   = "${local.prj_initials_lmb}-backend"
+      Name = "${local.prj_initials_lmb}-API-Gateway"
+    }
+  )
 }
 
 ############################
