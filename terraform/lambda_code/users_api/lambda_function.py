@@ -72,7 +72,7 @@ def get_db_connection():
 # Users
 # ============================================================
 
-@app.get("/user/me")
+@app.get("/api/user/me")
 def get_user():
     return Response(
         status_code=200,
@@ -80,7 +80,7 @@ def get_user():
         body='{"message":"User returned"}'
     )
 
-@app.post("/user")
+@app.post("/api/user")
 def create_user():
     return Response(
         status_code=200,
@@ -89,7 +89,7 @@ def create_user():
     )
 
 
-@app.put("/user/me")
+@app.put("/api/user/me")
 def update_user():
     return Response(
         status_code=200,

@@ -72,8 +72,8 @@ def get_db_connection():
 # Services
 # ============================================================
 
-@app.get("/services")
-def list_services():
+@app.get("/api/service")
+def list_service():
 
     logger.info("GET /services request received")
 
@@ -207,7 +207,7 @@ def list_services():
 
         logger.info("Request completed")
 
-@app.post("/services")
+@app.post("/api/service")
 def create_service():
     return Response(
         status_code=200,
@@ -215,7 +215,7 @@ def create_service():
         body='{"message":"Service created"}'
     )
 
-@app.get("/services/<service_id>")
+@app.get("/api/service/<service_id>")
 def get_service(service_id: str):
     return Response(
         status_code=200,
@@ -224,7 +224,7 @@ def get_service(service_id: str):
     )
 
 
-@app.put("/services/<service_id>")
+@app.put("/api/service/<service_id>")
 def update_service(service_id: str):
     return Response(
         status_code=200,
@@ -233,7 +233,7 @@ def update_service(service_id: str):
     )
 
 
-@app.delete("/services/<service_id>")
+@app.delete("/api/service/<service_id>")
 def delete_service(service_id: str):
     return Response(
         status_code=200,

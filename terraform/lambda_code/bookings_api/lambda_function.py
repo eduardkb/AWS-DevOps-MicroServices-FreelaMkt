@@ -72,7 +72,7 @@ def get_db_connection():
 # Bookings
 # ============================================================
 
-@app.get("/booking")
+@app.get("/api/booking")
 def get_booking():
     return Response(
         status_code=200,
@@ -80,7 +80,7 @@ def get_booking():
         body='{"message":"Booking returned"}'
     )
 
-@app.post("/booking")
+@app.post("/api/booking")
 def create_booking():
     return Response(
         status_code=200,
@@ -89,7 +89,7 @@ def create_booking():
     )
 
 
-@app.put("/booking/<booking_id>/status")
+@app.put("/api/booking/<booking_id>/status")
 def update_booking(booking_id: str):
     return Response(
         status_code=200,
