@@ -49,20 +49,20 @@ Core Services:
 
 ---
 
-### Phase 3 - Backend Microservices (Lambda)
+### Phase 3 - Backend Microservices (Lambda) [COMPLETED]
 - Create Lambda functions:
   - User management
   - Service listings
   - Booking system
   - Payments (mock or integration-ready)
-- Implement connection pooling (RDS Proxy recommended)
+- Implement connection pooling (RDS Proxy recommended) - not implemented because of cost limitations and this being a dev/test app.
 - Integrate Secrets Manager for DB credentials
 - Add structured logging
 
 ---
 
 ### Phase 4 - API Gateway
-- Create REST or HTTP API Gateway
+- Create HTTP API Gateway
 - Define routes (/api/*)
 - Integrate with Lambda functions
 - Enable request validation

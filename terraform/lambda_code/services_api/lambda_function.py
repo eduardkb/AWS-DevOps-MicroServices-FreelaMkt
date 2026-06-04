@@ -3,9 +3,9 @@ import json
 import boto3
 import psycopg2
 
-from aws_lambda_powertools import Logger
-from aws_lambda_powertools.event_handler import APIGatewayHttpResolver
-from aws_lambda_powertools.event_handler import Response
+from aws_lambda_powertools import Logger # type: ignore
+from aws_lambda_powertools.event_handler import APIGatewayHttpResolver # type: ignore
+from aws_lambda_powertools.event_handler import Response # type: ignore
 
 logger = Logger()
 
