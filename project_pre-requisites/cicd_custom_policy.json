@@ -16,7 +16,8 @@
         "resource-groups:*",
         "apigateway:*",
         "ecs:*",
-        "ecr:*"
+        "ecr:*",
+        "elasticloadbalancing:*"
       ],
       "Resource": "*"
     },
@@ -54,6 +55,7 @@
         "StringEquals": {
           "iam:PassedToService": [
             "lambda.amazonaws.com",
+            "ec2.amazonaws.com",
             "ec2.amazonaws.com",
             "rds.amazonaws.com"
           ]
