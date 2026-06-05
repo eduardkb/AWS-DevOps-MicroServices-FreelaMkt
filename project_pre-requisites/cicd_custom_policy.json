@@ -56,7 +56,7 @@
           "iam:PassedToService": [
             "lambda.amazonaws.com",
             "ec2.amazonaws.com",
-            "ec2.amazonaws.com",
+            "ecs-tasks.amazonaws.com",
             "rds.amazonaws.com"
           ]
         }
@@ -72,7 +72,8 @@
         "StringLike": {
           "iam:AWSServiceName": [
             "rds.amazonaws.com",
-            "lambda.amazonaws.com"
+            "lambda.amazonaws.com",
+            "elasticloadbalancing.amazonaws.com"
           ]
         }
       }
