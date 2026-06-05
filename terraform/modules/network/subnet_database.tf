@@ -1,7 +1,7 @@
 # Private DB subnet A 
 resource "aws_subnet" "private_db_a" {
   vpc_id            = aws_vpc.this.id
-  cidr_block        = "192.168.1.0/24"
+  cidr_block        = "192.168.11.0/24"
   map_public_ip_on_launch = false
   availability_zone = local.az_a
 
@@ -17,7 +17,7 @@ resource "aws_subnet" "private_db_a" {
 # Private DB subnet B
 resource "aws_subnet" "private_db_b" {
   vpc_id            = aws_vpc.this.id
-  cidr_block        = "192.168.2.0/24"
+  cidr_block        = "192.168.12.0/24"
   map_public_ip_on_launch = false
   availability_zone = local.az_b
 

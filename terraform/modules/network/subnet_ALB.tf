@@ -3,7 +3,7 @@
 #################################################
 resource "aws_subnet" "public_alb_a" {
   vpc_id                  = aws_vpc.this.id
-  cidr_block              = "192.168.7.0/24"
+  cidr_block              = "192.168.41.0/24"
   map_public_ip_on_launch = true
   availability_zone       = local.az_a
 
@@ -18,7 +18,7 @@ resource "aws_subnet" "public_alb_a" {
 
 resource "aws_subnet" "public_alb_b" {
   vpc_id                  = aws_vpc.this.id
-  cidr_block              = "192.168.8.0/24"
+  cidr_block              = "192.168.42.0/24"
   map_public_ip_on_launch = true
   availability_zone       = local.az_b
 

@@ -1,7 +1,7 @@
 # Private subnet A for Lambda functions (no internet access)
 resource "aws_subnet" "private_lambda_a" {
   vpc_id                  = aws_vpc.this.id
-  cidr_block              = "192.168.3.0/24"
+  cidr_block              = "192.168.21.0/24"
   map_public_ip_on_launch = false
   availability_zone       = local.az_a
 
