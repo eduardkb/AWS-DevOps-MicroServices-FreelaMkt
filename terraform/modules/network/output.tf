@@ -26,8 +26,12 @@ output "alb_security_group_id" {
   value = aws_security_group.alb.id
 }
 
-output "alb_subnet_id" {
-  value = aws_subnet.public_alb.id
+output "alb_subnet_a_id" {
+  value = aws_subnet.public_alb_a.id
+}
+
+output "alb_subnet_b_id" {
+  value = aws_subnet.public_alb_b.id
 }
 
 output "vpc_id" {

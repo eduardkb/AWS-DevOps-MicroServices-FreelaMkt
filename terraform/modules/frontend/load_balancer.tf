@@ -8,7 +8,7 @@ resource "aws_lb" "frontend" {
   internal           = false
 
   security_groups = [var.alb_security_group_id]
-  subnets = [ var.alb_subnet_id ]
+  subnets = [ var.alb_subnet_a_id, var.alb_subnet_b_id ]
 
   tags = merge(
     var.shared_tags,

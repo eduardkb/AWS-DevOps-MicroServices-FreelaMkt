@@ -39,10 +39,10 @@ module "database" {
   rds_security_group_id  = module.network.rds_security_group_id
 
   # imported from security module
-  postgre_secret = module.security.postgre_secret 
-  aws_kms_cmk_arn = module.security.aws_kms_cmk_arn
+  postgre_secret    = module.security.postgre_secret 
+  aws_kms_cmk_arn   = module.security.aws_kms_cmk_arn
 
-  depends_on = [module.security]
+  depends_on        = [module.security]
 }
 
 module "frontend" {
@@ -53,10 +53,11 @@ module "frontend" {
 
   # from network module
   fargate_subnet_a_id         = module.network.fargate_subnet_a_id 
-  fargate_security_group_id = module.network.fargate_security_group_id
-  alb_subnet_id = module.network.alb_subnet_id
-  alb_security_group_id = module.network.alb_security_group_id
-  vpc_id = module.network.vpc_id
+  fargate_security_group_id   = module.network.fargate_security_group_id
+  alb_subnet_a_id             = module.network.alb_subnet_a_id
+  alb_subnet_b_id             = module.network.alb_subnet_b_id
+  alb_security_group_id       = module.network.alb_security_group_id
+  vpc_id                      = module.network.vpc_id
 }
 
 module "backend" {

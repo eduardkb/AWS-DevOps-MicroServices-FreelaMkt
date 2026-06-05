@@ -1,7 +1,7 @@
 #################################################
 # Public subnet for ALB (with internet access)
 #################################################
-resource "aws_subnet" "public_alb" {
+resource "aws_subnet" "public_alb_a" {
   vpc_id                  = aws_vpc.this.id
   cidr_block              = "192.168.7.0/24"
   map_public_ip_on_launch = true
@@ -11,7 +11,22 @@ resource "aws_subnet" "public_alb" {
     var.shared_tags,
     {
       id   = "${local.prj_initials}-network"
-      Name = "${local.prj_initials}-public-subnet-alb"
+      Name = "${local.prj_initials}-public-subnet-alb-a"
+    }
+  )
+}
+
+resource "aws_subnet" "public_alb_b" {
+  vpc_id                  = aws_vpc.this.id
+  cidr_block              = "192.168.8.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = local.az_b
+
+  tags = merge(
+    var.shared_tags,
+    {
+      id   = "${local.prj_initials}-network"
+      Name = "${local.prj_initials}-public-subnet-alb-b"
     }
   )
 }
@@ -55,8 +70,13 @@ resource "aws_route_table" "public" {
 }
 
 # associate the public route table with the ALB subnet
-resource "aws_route_table_association" "public_alb" {
-  subnet_id      = aws_subnet.public_alb.id
+resource "aws_route_table_association" "public_alb_a" {
+  subnet_id      = aws_subnet.public_alb_a.id
+  route_table_id = aws_route_table.public.id
+}
+
+resource "aws_route_table_association" "public_alb_b" {
+  subnet_id      = aws_subnet.public_alb_b.id
   route_table_id = aws_route_table.public.id
 }
 
