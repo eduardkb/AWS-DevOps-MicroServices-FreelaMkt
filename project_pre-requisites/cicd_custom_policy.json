@@ -14,7 +14,9 @@
         "secretsmanager:*",
         "s3:*",
         "resource-groups:*",
-        "apigateway:*"
+        "apigateway:*",
+        "ecs:*",
+        "ecr:*"
       ],
       "Resource": "*"
     },

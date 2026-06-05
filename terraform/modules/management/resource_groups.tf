@@ -61,3 +61,23 @@ resource "aws_resourcegroups_group" "security_group" {
 
   tags = var.shared_tags
 }
+
+resource "aws_resourcegroups_group" "frontend_group" {
+  name        = "${local.prj_initials}-frontend"
+  description = "All frontend resources tagged with FreelaMkp-Frontend"
+  resource_query {
+    type = "TAG_FILTERS_1_0"
+    
+    query = jsonencode({
+      ResourceTypeFilters = ["AWS::AllSupported"]
+      TagFilters = [
+        {
+          Key    = "id"
+          Values = ["${local.prj_initials}-frontend"]
+        }
+      ]
+    })
+  }
+
+  tags = var.shared_tags
+}

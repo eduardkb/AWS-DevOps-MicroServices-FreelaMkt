@@ -45,6 +45,20 @@ module "database" {
   depends_on = [module.security]
 }
 
+module "frontend" {
+  source = "../../modules/frontend"
+  project_initials = module.global.project_initials
+  project_code     = module.global.project_code
+  shared_tags      = module.global.shared_tags
+
+  # from network module
+  fargate_subnet_a_id         = module.network.fargate_subnet_a_id 
+  fargate_security_group_id = module.network.fargate_security_group_id
+  alb_subnet_id = module.network.alb_subnet_id
+  alb_security_group_id = module.network.alb_security_group_id
+  vpc_id = module.network.vpc_id
+}
+
 module "backend" {
   source = "../../modules/backend"
 

@@ -1,0 +1,113 @@
+#################################################
+# Public subnet for ALB (with internet access)
+#################################################
+resource "aws_subnet" "public_alb" {
+  vpc_id                  = aws_vpc.this.id
+  cidr_block              = "192.168.7.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = local.az_a
+
+  tags = merge(
+    var.shared_tags,
+    {
+      id   = "${local.prj_initials}-network"
+      Name = "${local.prj_initials}-public-subnet-alb"
+    }
+  )
+}
+
+#################################################
+# Internet Gateway for ALB subnet
+#################################################
+
+resource "aws_internet_gateway" "this" {
+  vpc_id = aws_vpc.this.id
+
+  tags = merge(
+    var.shared_tags,
+    {
+      id   = "${local.prj_initials}-network"
+      Name = "${local.prj_initials}-igw"
+    }
+  )
+}
+
+
+#################################################
+# Route Table for ALB subnet
+#################################################
+
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.this.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.this.id
+  }
+
+  tags = merge(
+    var.shared_tags,
+    {
+      id   = "${local.prj_initials}-network"
+      Name = "${local.prj_initials}-public-rt"
+    }
+  )
+}
+
+# associate the public route table with the ALB subnet
+resource "aws_route_table_association" "public_alb" {
+  subnet_id      = aws_subnet.public_alb.id
+  route_table_id = aws_route_table.public.id
+}
+
+#################################################
+# Security Group for ALB subnet
+#################################################
+
+resource "aws_security_group" "alb" {
+  name        = "${local.prj_initials}-alb-sg"
+  description = "ALB security group"
+  vpc_id      = aws_vpc.this.id
+
+  tags = merge(
+    var.shared_tags,
+    {
+      id   = "${local.prj_initials}-network"
+      Name = "${local.prj_initials}-alb-sg"
+    }
+  )
+}
+
+resource "aws_vpc_security_group_ingress_rule" "alb_https_inbound" {
+  security_group_id = aws_security_group.alb.id
+
+  description = "HTTPS from internet"
+  ip_protocol = "tcp"
+  from_port   = 443
+  to_port     = 443
+
+  cidr_ipv4 = "0.0.0.0/0"
+}
+
+resource "aws_vpc_security_group_egress_rule" "alb_to_fargate" {
+  security_group_id = aws_security_group.alb.id
+
+  description = "To Fargate"
+  ip_protocol = "tcp"
+  from_port   = 80
+  to_port     = 80
+
+  referenced_security_group_id = aws_security_group.fargate_sg.id
+}
+
+# TODO: temp SG Rule. delete after ALB tests finished
+resource "aws_vpc_security_group_ingress_rule" "alb_http_inbound" {
+  security_group_id = aws_security_group.alb.id
+
+  description = "HTTP from internet"
+  ip_protocol = "tcp"
+  from_port   = 80
+  to_port     = 80
+
+  cidr_ipv4 = "0.0.0.0/0"
+}

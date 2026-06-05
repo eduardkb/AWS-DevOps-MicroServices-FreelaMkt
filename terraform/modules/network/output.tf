@@ -13,3 +13,23 @@ output "lambda_subnet_a_id" {
 output "lambda_security_group_id" {
   value = aws_security_group.lambda_sg.id
 }
+
+output "fargate_subnet_a_id" {
+  value = aws_subnet.private_fargate_a.id
+}
+
+output "fargate_security_group_id" {
+  value = aws_security_group.fargate_sg.id
+}
+
+output "alb_security_group_id" {
+  value = aws_security_group.alb.id
+}
+
+output "alb_subnet_id" {
+  value = aws_subnet.public_alb.id
+}
+
+output "vpc_id" {
+  value = aws_vpc.this.id  
+}
