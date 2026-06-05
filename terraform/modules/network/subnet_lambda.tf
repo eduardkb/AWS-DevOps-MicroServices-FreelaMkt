@@ -14,22 +14,6 @@ resource "aws_subnet" "private_lambda_a" {
   )
 }
 
-# Private subnet B for Lambda functions (no internet access)
-resource "aws_subnet" "private_lambda_b" {
-  vpc_id                  = aws_vpc.this.id
-  cidr_block              = "192.168.4.0/24"
-  map_public_ip_on_launch = false
-  availability_zone       = local.az_b
-
-  tags = merge(
-    var.shared_tags,
-    {
-      id   = "${local.prj_initials}-network"
-      Name = "${local.prj_initials}-private-subnet-lambda-b"
-    }
-  )
-}
-
 # Migration Lambda - Security group
 resource "aws_security_group" "lambda_sg" {
   name   = "${local.prj_initials}-lambda-sg"

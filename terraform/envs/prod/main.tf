@@ -54,7 +54,6 @@ module "backend" {
 
   # from network module
   lambda_subnet_a_id         = module.network.lambda_subnet_a_id
-  lambda_subnet_b_id         = module.network.lambda_subnet_b_id
   lambda_security_group_id = module.network.lambda_security_group_id
 
   # from security module

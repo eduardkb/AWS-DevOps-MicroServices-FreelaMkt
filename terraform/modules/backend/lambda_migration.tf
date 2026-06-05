@@ -38,7 +38,7 @@ resource "aws_lambda_function" "db_migration" {
   role             = var.lambda_migration_role_arn
 
   vpc_config {
-    subnet_ids         = [var.lambda_subnet_a_id, var.lambda_subnet_b_id]
+    subnet_ids         = [var.lambda_subnet_a_id]
     security_group_ids = [var.lambda_security_group_id]
   }
 

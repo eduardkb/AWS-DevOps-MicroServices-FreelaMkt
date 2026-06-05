@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %} – All Services{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <h1 class="page-title">All Services</h1>
+  <p class="page-subtitle">Browse top-rated IT &amp; tech professionals ready to help you ship faster.</p>
+</section>
+
+<section class="table-section">
+  <div class="table-wrapper">
+    <table class="services-table" aria-label="Available services">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Service</th>
+          <th>Category</th>
+          <th>Provider</th>
+          <th>Rating</th>
+          <th>Price</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for svc in services %}
+        <tr>
+          <td class="td-id">{{ svc.id }}</td>
+          <td class="td-title">{{ svc.title }}</td>
+          <td><span class="badge badge-category">{{ svc.category }}</span></td>
+          <td class="td-provider">
+            <span class="avatar">{{ svc.provider[0] }}</span>
+            {{ svc.provider }}
+          </td>
+          <td class="td-rating">
+            <span class="stars">★</span> {{ svc.rating }}
+          </td>
+          <td class="td-price">{{ svc.price }}</td>
+          <td>
+            <span class="badge {% if svc.status == 'Available' %}badge-available{% else %}badge-busy{% endif %}">
+              {{ svc.status }}
+            </span>
+          </td>
+          <td>
+            <button class="btn-book" aria-label="Book {{ svc.title }}">Book</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

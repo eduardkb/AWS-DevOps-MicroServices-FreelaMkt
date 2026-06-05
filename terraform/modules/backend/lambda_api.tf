@@ -21,7 +21,7 @@ resource "aws_lambda_function" "users_api" {
   role             = var.lambda_api_role_arn
 
   vpc_config {
-    subnet_ids         = [var.lambda_subnet_a_id, var.lambda_subnet_b_id]
+    subnet_ids         = [var.lambda_subnet_a_id]
     security_group_ids = [var.lambda_security_group_id]
   }
 
@@ -66,7 +66,7 @@ resource "aws_lambda_function" "services_api" {
   role             = var.lambda_api_role_arn
 
   vpc_config {
-    subnet_ids         = [var.lambda_subnet_a_id, var.lambda_subnet_b_id]
+    subnet_ids         = [var.lambda_subnet_a_id]
     security_group_ids = [var.lambda_security_group_id]
   }
 
@@ -111,7 +111,7 @@ resource "aws_lambda_function" "bookings_api" {
   role             = var.lambda_api_role_arn
 
   vpc_config {
-    subnet_ids         = [var.lambda_subnet_a_id, var.lambda_subnet_b_id]
+    subnet_ids         = [var.lambda_subnet_a_id]
     security_group_ids = [var.lambda_security_group_id]
   }
 

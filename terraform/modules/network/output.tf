@@ -10,10 +10,6 @@ output "lambda_subnet_a_id" {
   value = aws_subnet.private_lambda_a.id
 }
 
-output "lambda_subnet_b_id" {
-  value = aws_subnet.private_lambda_b.id
-}
-
 output "lambda_security_group_id" {
   value = aws_security_group.lambda_sg.id
 }
