@@ -1,4 +1,4 @@
-name: 20-destroy-infra
+name: 20-Destroy-Infra
 
 on:
   workflow_dispatch:
