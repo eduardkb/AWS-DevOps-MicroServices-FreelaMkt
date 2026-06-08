@@ -154,5 +154,5 @@ resource "aws_ecs_service" "webapp" {
     }
   )
 
-  depends_on = [ aws_lb_listener.http, aws_iam_service_linked_role.ecs ]
+  depends_on = [ aws_lb_listener.http ]
 }
