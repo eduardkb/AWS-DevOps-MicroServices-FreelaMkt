@@ -187,7 +187,7 @@ jobs:
           echo "Current Task Definition: $TASK_DEF_ARN"
 
           # Create a new task definition revision using the new image
-          NEW_TASK_DEF=$(aws ecs describe-task-definition \
+          aws ecs describe-task-definition \
             --task-definition "$TASK_DEF_ARN" \
             --query 'taskDefinition' \
             --output json \
@@ -202,13 +202,12 @@ jobs:
                     .registeredAt,
                     .registeredBy
                   )
-              ')
+              ' > task-def.json
 
-          NEW_TASK_DEF_ARN=$(echo "$NEW_TASK_DEF" \
-            | aws ecs register-task-definition \
-                --cli-input-json /dev/stdin \
-                --query 'taskDefinition.taskDefinitionArn' \
-                --output text)
+          NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://task-def.json \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
 
           echo "New Task Definition: $NEW_TASK_DEF_ARN"
 
