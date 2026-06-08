@@ -124,9 +124,6 @@ resource "aws_cloudwatch_log_group" "webapp" {
 #################################################
 # ECS Service
 #################################################
-resource "aws_iam_service_linked_role" "ecs" {
-  aws_service_name = "ecs.amazonaws.com"
-}
 
 resource "aws_ecs_service" "webapp" {
   name            = "${local.prj_initials}-webapp-service"

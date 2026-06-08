@@ -82,5 +82,14 @@ aws s3api put-bucket-tagging `
 
 Enable AWS CloudTrail to have management events sent to S3 bucket. 
 
-###
+## Other Requirements:
+
+### Service Linked Role for AWS ECS
+
+- If this is a new account, make sure the ECS Service Linked Role is active
+
+```sh
+aws iam create-service-linked-role \
+  --aws-service-name ecs.amazonaws.com
+```
 
