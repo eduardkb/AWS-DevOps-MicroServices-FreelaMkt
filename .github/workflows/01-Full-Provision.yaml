@@ -21,12 +21,12 @@ permissions:
   contents: read
 
 jobs:
-  # ── Job 1: Provision all infrastructure 
-  # ──────────────────────────────────
+  # ── Job 1: Provision all infrastructure ──────────────────────────────────
   terraform-apply:
     runs-on: ubuntu-latest
     outputs:
       migration_function_name: ${{ steps.tf_outputs.outputs.migration_function_name }}
+      ecr_repository_url: ${{ steps.tf_outputs.outputs.ecr_repository_url }}
 
     steps:
       - name: Checkout
@@ -37,7 +37,7 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::217037953500:role/FreelaMkp-GitCiCd-Role
           aws-region: us-east-1
-          audience: sts.amazonaws.com   
+          audience: sts.amazonaws.com
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -55,7 +55,6 @@ jobs:
             --target backend_API/shared_layer/python \
             psycopg2-binary boto3 \
             aws-lambda-powertools
-            
 
       - name: Terraform Init
         working-directory: terraform/envs/${{ inputs.environment }}/
@@ -72,7 +71,46 @@ jobs:
           FUNC=$(terraform output -raw migration_function_name)
           echo "migration_function_name=$FUNC" >> "$GITHUB_OUTPUT"
 
-  # ── Job 2: Run DB migration via Lambda ───────────────────────────────────
+          ECR_URL=$(terraform output -raw ecr_repository_url)
+          echo "ecr_repository_url=$ECR_URL" >> "$GITHUB_OUTPUT"
+
+  # ── Job 2: Build Docker image and push to ECR ─────────────────────────────
+  # Runs after terraform-apply (ECR must exist). Runs in parallel with db-migrate.
+  build-and-push-ecr:
+    runs-on: ubuntu-latest
+    needs: terraform-apply
+    outputs:
+      image_uri: ${{ steps.push.outputs.image_uri }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: arn:aws:iam::217037953500:role/FreelaMkp-GitCiCd-Role
+          aws-region: us-east-1
+          audience: sts.amazonaws.com
+
+      - name: Log in to Amazon ECR
+        id: ecr_login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push image to ECR
+        id: push
+        env:
+          ECR_REGISTRY: ${{ steps.ecr_login.outputs.registry }}
+          ECR_REPO_URL: ${{ needs.terraform-apply.outputs.ecr_repository_url }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REPO_URL:$IMAGE_TAG -t $ECR_REPO_URL:latest ./frontend_webApp
+          docker push $ECR_REPO_URL:$IMAGE_TAG
+          docker push $ECR_REPO_URL:latest
+          echo "image_uri=$ECR_REPO_URL:$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+
+  # ── Job 3: Run DB migration via Lambda ────────────────────────────────────
+  # Also runs after terraform-apply, in parallel with build-and-push-ecr.
   db-migrate:
     runs-on: ubuntu-latest
     needs: terraform-apply
@@ -94,15 +132,80 @@ jobs:
             --log-type Tail \
             response.json)
 
-          # Print Lambda tail logs (base64-encoded in the response)
           echo "$RESPONSE" | jq -r '.LogResult' | base64 --decode || true
-
-          # Read the actual function response
           cat response.json
 
-          # Fail the job if Lambda returned an error
           SUCCESS=$(cat response.json | jq -r '.success // false')
           if [ "$SUCCESS" != "true" ]; then
             echo "Migration Lambda returned an error!"
             exit 1
           fi
+
+  # ── Job 4: Update ECS Fargate to use the new ECR image ───────────────────
+  # Runs after both build-and-push-ecr and db-migrate complete.
+  update-ecs:
+    runs-on: ubuntu-latest
+    needs: [build-and-push-ecr, db-migrate]
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: arn:aws:iam::217037953500:role/FreelaMkp-GitCiCd-Role
+          aws-region: us-east-1
+          audience: sts.amazonaws.com
+
+      - name: Update ECS service with new image
+        env:
+          IMAGE_URI: ${{ needs.build-and-push-ecr.outputs.image_uri }}
+        run: |
+          # Discover cluster and service names by tag (avoids hard-coding the random suffix)
+          CLUSTER=$(aws ecs list-clusters --query 'clusterArns[]' --output text \
+            | tr '\t' '\n' \
+            | xargs -I{} aws ecs describe-clusters --clusters {} \
+                --query "clusters[?tags[?key=='id' && contains(value,'frontend')]].clusterName" \
+                --output text)
+
+          SERVICE=$(aws ecs list-services --cluster "$CLUSTER" --query 'serviceArns[]' --output text \
+            | tr '\t' '\n' \
+            | xargs -I{} aws ecs describe-services --cluster "$CLUSTER" --services {} \
+                --query "services[?tags[?key=='id' && contains(value,'frontend')]].serviceName" \
+                --output text)
+
+          echo "Cluster: $CLUSTER  |  Service: $SERVICE"
+
+          # Get current task definition and patch the container image
+          TASK_DEF_ARN=$(aws ecs describe-services \
+            --cluster "$CLUSTER" --services "$SERVICE" \
+            --query 'services[0].taskDefinition' --output text)
+
+          NEW_TASK_DEF=$(aws ecs describe-task-definition \
+            --task-definition "$TASK_DEF_ARN" \
+            --query 'taskDefinition' \
+            | jq --arg IMAGE "$IMAGE_URI" '
+                .containerDefinitions[0].image = $IMAGE
+                | del(.taskDefinitionArn, .revision, .status,
+                       .requiresAttributes, .compatibilities,
+                       .registeredAt, .registeredBy)
+              ')
+
+          NEW_TASK_DEF_ARN=$(echo "$NEW_TASK_DEF" \
+            | aws ecs register-task-definition --cli-input-json /dev/stdin \
+            --query 'taskDefinition.taskDefinitionArn' --output text)
+
+          echo "Registered new task definition: $NEW_TASK_DEF_ARN"
+
+          # Force a new deployment so ECS pulls the updated image
+          aws ecs update-service \
+            --cluster "$CLUSTER" \
+            --service "$SERVICE" \
+            --task-definition "$NEW_TASK_DEF_ARN" \
+            --force-new-deployment
+
+          echo "ECS service update triggered. Waiting for stability..."
+
+          aws ecs wait services-stable \
+            --cluster "$CLUSTER" \
+            --services "$SERVICE"
+
+          echo "ECS service is stable with new image."

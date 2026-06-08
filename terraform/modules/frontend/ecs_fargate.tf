@@ -71,9 +71,7 @@ resource "aws_ecs_task_definition" "webapp" {
   container_definitions = jsonencode([
     {
       name  = "webapp"
-      image = "eduardbuhali/thoughtsapp:v1" # temporary image for testing
-      # TODO: replace the temporary image with below once ECR has the image pushed
-      # image = "${aws_ecr_repository.webapp.repository_url}:latest"
+      image = "${aws_ecr_repository.webapp.repository_url}:latest"
 
       essential = true
 
