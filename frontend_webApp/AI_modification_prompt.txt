@@ -5,4 +5,4 @@ priority is to generate the code requested code below.
 Always zip only the files that needed to be modified to the results.zip file and let me download it.
 
 Modifications:
-    - 
+    - the appVersion.env file should have a "APP_VERSION" variable. this variable (content example: 1.0.2) should be read and dinamically inserted into the footer in format "Developed by <strong>E.K.B</strong> - v1.0.2"

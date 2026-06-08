@@ -1,4 +1,4 @@
-
+- is there a resource without tags / default name?
 - create webApp in Python Flask
 - create cognito user pool and auth settings with TF.
 - user creation notes
