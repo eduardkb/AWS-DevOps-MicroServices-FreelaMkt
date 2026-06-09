@@ -97,7 +97,7 @@ def update_user():
         body=f'{{"message":"User updated"}}'
     )
 
-@app.get("/api/healthcheck")
+@app.get("/api/user/healthcheck")
 def healthcheck():
     return Response(
         status_code=200,
@@ -106,7 +106,7 @@ def healthcheck():
     )
 
 
-@app.get("/api/getparam")
+@app.get("/api/user/getparam")
 def getparam():
     return Response(
         status_code=200,
