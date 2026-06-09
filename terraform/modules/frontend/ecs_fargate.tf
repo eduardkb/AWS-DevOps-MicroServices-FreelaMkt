@@ -1,8 +1,16 @@
 locals {
   prj_initials = lower("${var.project_initials}-${var.project_code}")
+  app_version  = trimspace(replace(
+    file("${path.root}/../../../frontend_webApp/appVersion.env"),
+    "APP_VERSION=", ""
+  ))
 }
 
 data "aws_region" "current" {}
+
+resource "random_id" "secret_key" {
+  byte_length = 31   # produces 62 hex characters
+}
 
 #################################################
 # ECS Cluster
@@ -70,9 +78,8 @@ resource "aws_ecs_task_definition" "webapp" {
 
   container_definitions = jsonencode([
     {
-      name  = "webapp"
-      image = "${aws_ecr_repository.webapp.repository_url}:latest"
-
+      name      = "webapp"
+      image     = "${aws_ecr_repository.webapp.repository_url}:latest"
       essential = true
 
       portMappings = [
@@ -83,9 +90,15 @@ resource "aws_ecs_task_definition" "webapp" {
         }
       ]
 
+      environment = [
+        { name = "FLASK_ENV",   value = "development" },
+        { name = "SECRET_KEY",  value = random_id.secret_key.hex },
+        { name = "API_URL",     value = "http://localhost:8080" },
+        { name = "APP_VERSION", value = local.app_version }
+      ]
+
       logConfiguration = {
         logDriver = "awslogs"
-
         options = {
           awslogs-group         = aws_cloudwatch_log_group.webapp.name
           awslogs-region        = data.aws_region.current.region

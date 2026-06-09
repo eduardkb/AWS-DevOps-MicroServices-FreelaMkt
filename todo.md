@@ -1,5 +1,7 @@
+- API Gateway - validate cloudfront_secret_header on lambda
+    - write secret to lambda env. variables
+    - check with recieved parameter.
 - is there a resource without tags / default name?
-- create webApp in Python Flask
 - create cognito user pool and auth settings with TF.
 - user creation notes
     - create user in AWS Cognito

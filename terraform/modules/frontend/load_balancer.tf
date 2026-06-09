@@ -65,3 +65,38 @@ resource "aws_lb_listener" "http" {
     target_group_arn = aws_lb_target_group.frontend.arn
   }
 }
+
+resource "aws_lb_listener_rule" "allow_cloudfront" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 1
+
+  condition {
+    http_header {
+      http_header_name = "X-CloudFront-Secret"
+      values           = [var.cloudfront_secret_header]
+    }
+  }
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.frontend.arn
+  }
+}
+
+resource "aws_lb_listener_rule" "block_direct" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 2
+
+  condition {
+    path_pattern { values = ["/*"] }
+  }
+
+  action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Forbidden"
+      status_code  = "403"
+    }
+  }
+}

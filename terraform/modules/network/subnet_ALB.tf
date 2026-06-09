@@ -98,15 +98,18 @@ resource "aws_security_group" "alb" {
   )
 }
 
-resource "aws_vpc_security_group_ingress_rule" "alb_https_inbound" {
+data "aws_ec2_managed_prefix_list" "cloudfront" {
+  name = "com.amazonaws.global.cloudfront.origin-facing"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "alb_from_cloudfront" {
   security_group_id = aws_security_group.alb.id
 
-  description = "HTTPS from internet"
-  ip_protocol = "tcp"
-  from_port   = 443
-  to_port     = 443
-
-  cidr_ipv4 = "0.0.0.0/0"
+  description    = "HTTP from CloudFront only"
+  ip_protocol    = "tcp"
+  from_port      = 80
+  to_port        = 80
+  prefix_list_id = data.aws_ec2_managed_prefix_list.cloudfront.id
 }
 
 resource "aws_vpc_security_group_egress_rule" "alb_to_fargate" {
@@ -118,16 +121,4 @@ resource "aws_vpc_security_group_egress_rule" "alb_to_fargate" {
   to_port     = 80
 
   referenced_security_group_id = aws_security_group.fargate_sg.id
-}
-
-# TODO: temp SG Rule. delete after ALB tests finished
-resource "aws_vpc_security_group_ingress_rule" "alb_http_inbound" {
-  security_group_id = aws_security_group.alb.id
-
-  description = "HTTP from internet"
-  ip_protocol = "tcp"
-  from_port   = 80
-  to_port     = 80
-
-  cidr_ipv4 = "0.0.0.0/0"
 }

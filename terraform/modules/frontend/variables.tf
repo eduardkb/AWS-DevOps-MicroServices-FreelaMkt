@@ -9,3 +9,9 @@ variable "alb_subnet_a_id" { type = string }
 variable "alb_subnet_b_id" { type = string }
 variable "alb_security_group_id" { type = string }
 variable "vpc_id" { type = string }
+
+variable "cloudfront_secret_header" {
+  description = "Secret header value; requests without it are blocked"
+  type        = string
+  sensitive   = true
+}
