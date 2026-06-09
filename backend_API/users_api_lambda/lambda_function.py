@@ -112,8 +112,8 @@ def getparam():
         status_code=200,
         content_type="application/json",
         body=json.dumps({
-            "message": "parameters returned",
-            "parameters": app.current_event.to_dict()
+            "message": "event parameters returned",
+            "event": app.current_event.raw_event
         })
     )
 # ============================================================
