@@ -12,7 +12,7 @@ resource "aws_cloudfront_distribution" "main_cf" {
   # Origin: API Gateway
   origin {
     origin_id   = local.cf_api_origin_id
-    domain_name = replace(var.api_gateway_invoke_url, "/^https?:\\/\\//", "")
+    domain_name = split("/", replace(var.api_gateway_invoke_url, "https://", ""))[0]
 
     custom_origin_config {
       http_port              = 80
