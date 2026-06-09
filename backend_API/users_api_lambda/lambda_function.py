@@ -151,6 +151,10 @@ def healthcheck():
 
 @app.get("/api/user/getparam")
 def getparam():
+    auth_error = validate_cloudfront_secret()
+    if auth_error:
+        return auth_error
+    
     return Response(
         status_code=200,
         content_type="application/json",
