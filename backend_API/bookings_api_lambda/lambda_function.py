@@ -67,6 +67,32 @@ def get_db_connection():
 
     return connection
 
+# ============================================================
+# CloudFront Header Validation Helper
+# ============================================================
+
+def validate_cloudfront_secret():
+    expected_secret = os.environ.get("CLOUDFRONT_SECRET_HEADER")
+
+    header_value = (
+        app.current_event.get_header_value(
+            name="x-cloudfront-secret",
+            default_value=None
+        )
+    )
+
+    if not expected_secret or header_value != expected_secret:
+        logger.warning(
+            "Invalid CloudFront secret header received"
+        )
+
+        return Response(
+            status_code=403,
+            content_type="application/json",
+            body='{"message":"Forbidden"}'
+        )
+
+    return None
 
 # ============================================================
 # Bookings
@@ -74,6 +100,10 @@ def get_db_connection():
 
 @app.get("/api/booking")
 def get_booking():
+    auth_error = validate_cloudfront_secret()
+    if auth_error:
+        return auth_error
+    
     return Response(
         status_code=200,
         content_type="application/json",
@@ -82,6 +112,10 @@ def get_booking():
 
 @app.post("/api/booking")
 def create_booking():
+    auth_error = validate_cloudfront_secret()
+    if auth_error:
+        return auth_error
+    
     return Response(
         status_code=200,
         content_type="application/json",
@@ -91,6 +125,10 @@ def create_booking():
 
 @app.put("/api/booking/<booking_id>/status")
 def update_booking(booking_id: str):
+    auth_error = validate_cloudfront_secret()
+    if auth_error:
+        return auth_error
+    
     return Response(
         status_code=200,
         content_type="application/json",

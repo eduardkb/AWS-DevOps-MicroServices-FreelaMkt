@@ -31,6 +31,7 @@ resource "aws_lambda_function" "users_api" {
       DB_HOST       = var.aurora_endpoint
       DB_PORT       = var.aurora_port
       DB_NAME       = var.aurora_name
+      CLOUDFRONT_SECRET_HEADER = var.cloudfront_secret_header
     }
   }
 
@@ -76,6 +77,7 @@ resource "aws_lambda_function" "services_api" {
       DB_HOST       = var.aurora_endpoint
       DB_PORT       = var.aurora_port
       DB_NAME       = var.aurora_name
+      CLOUDFRONT_SECRET_HEADER = var.cloudfront_secret_header 
     }
   }
 
@@ -121,6 +123,7 @@ resource "aws_lambda_function" "bookings_api" {
       DB_HOST       = var.aurora_endpoint
       DB_PORT       = var.aurora_port
       DB_NAME       = var.aurora_name
+      CLOUDFRONT_SECRET_HEADER = var.cloudfront_secret_header
     }
   }
 

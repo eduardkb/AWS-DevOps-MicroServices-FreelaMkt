@@ -67,6 +67,32 @@ def get_db_connection():
 
     return connection
 
+# ============================================================
+# CloudFront Header Validation Helper
+# ============================================================
+
+def validate_cloudfront_secret():
+    expected_secret = os.environ.get("CLOUDFRONT_SECRET_HEADER")
+
+    header_value = (
+        app.current_event.get_header_value(
+            name="x-cloudfront-secret",
+            default_value=None
+        )
+    )
+
+    if not expected_secret or header_value != expected_secret:
+        logger.warning(
+            "Invalid CloudFront secret header received"
+        )
+
+        return Response(
+            status_code=403,
+            content_type="application/json",
+            body='{"message":"Forbidden"}'
+        )
+
+    return None
 
 # ============================================================
 # Services
@@ -74,6 +100,10 @@ def get_db_connection():
 
 @app.get("/api/service")
 def list_service():
+    auth_error = validate_cloudfront_secret()
+    if auth_error:
+        return auth_error
+    
 
     logger.info("GET /services request received")
 
@@ -209,6 +239,10 @@ def list_service():
 
 @app.post("/api/service")
 def create_service():
+    auth_error = validate_cloudfront_secret()
+    if auth_error:
+        return auth_error
+    
     return Response(
         status_code=200,
         content_type="application/json",
@@ -217,6 +251,10 @@ def create_service():
 
 @app.get("/api/service/<service_id>")
 def get_service(service_id: str):
+    auth_error = validate_cloudfront_secret()
+    if auth_error:
+        return auth_error
+    
     return Response(
         status_code=200,
         content_type="application/json",
@@ -226,6 +264,10 @@ def get_service(service_id: str):
 
 @app.put("/api/service/<service_id>")
 def update_service(service_id: str):
+    auth_error = validate_cloudfront_secret()
+    if auth_error:
+        return auth_error
+    
     return Response(
         status_code=200,
         content_type="application/json",
@@ -235,6 +277,10 @@ def update_service(service_id: str):
 
 @app.delete("/api/service/<service_id>")
 def delete_service(service_id: str):
+    auth_error = validate_cloudfront_secret()
+    if auth_error:
+        return auth_error
+    
     return Response(
         status_code=200,
         content_type="application/json",

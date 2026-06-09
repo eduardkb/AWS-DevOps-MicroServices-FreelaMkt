@@ -58,6 +58,8 @@ module "backend" {
   aurora_port     = module.database.aurora_port
   aurora_name     = module.database.aurora_name
 
+  cloudfront_secret_header    = random_password.cloudfront_secret.result
+
   depends_on = [module.database, module.security, module.network]
 }
 

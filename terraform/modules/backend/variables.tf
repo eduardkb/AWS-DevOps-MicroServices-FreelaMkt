@@ -10,3 +10,4 @@ variable "db_secret_arn"               { type = string }
 variable "aurora_endpoint"           { type = string }
 variable "aurora_port"               { type = string }
 variable "aurora_name"               { type = string }
+variable "cloudfront_secret_header"    { type = string }

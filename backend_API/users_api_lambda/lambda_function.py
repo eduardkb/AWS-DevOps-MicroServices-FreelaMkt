@@ -69,11 +69,42 @@ def get_db_connection():
 
 
 # ============================================================
+# CloudFront Header Validation Helper
+# ============================================================
+
+def validate_cloudfront_secret():
+    expected_secret = os.environ.get("CLOUDFRONT_SECRET_HEADER")
+
+    header_value = (
+        app.current_event.get_header_value(
+            name="x-cloudfront-secret",
+            default_value=None
+        )
+    )
+
+    if not expected_secret or header_value != expected_secret:
+        logger.warning(
+            "Invalid CloudFront secret header received"
+        )
+
+        return Response(
+            status_code=403,
+            content_type="application/json",
+            body='{"message":"Forbidden"}'
+        )
+
+    return None
+
+# ============================================================
 # Users
 # ============================================================
 
 @app.get("/api/user/me")
 def get_user():
+    auth_error = validate_cloudfront_secret()
+    if auth_error:
+        return auth_error
+    
     return Response(
         status_code=200,
         content_type="application/json",
@@ -82,6 +113,10 @@ def get_user():
 
 @app.post("/api/user")
 def create_user():
+    auth_error = validate_cloudfront_secret()
+    if auth_error:
+        return auth_error
+
     return Response(
         status_code=200,
         content_type="application/json",
@@ -91,6 +126,10 @@ def create_user():
 
 @app.put("/api/user/me")
 def update_user():
+    auth_error = validate_cloudfront_secret()
+    if auth_error:
+        return auth_error
+    
     return Response(
         status_code=200,
         content_type="application/json",
@@ -99,6 +138,10 @@ def update_user():
 
 @app.get("/api/user/healthcheck")
 def healthcheck():
+    auth_error = validate_cloudfront_secret()
+    if auth_error:
+        return auth_error
+    
     return Response(
         status_code=200,
         content_type="application/json",

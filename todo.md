@@ -1,6 +1,8 @@
 - API Gateway - validate cloudfront_secret_header on lambda
     - write secret to lambda env. variables
     - check with recieved parameter.
+- test if cloudfront is exclusive. can I access API Gatewway or ALB?
+- remove default URL from cloudfront?
 - is there a resource without tags / default name?
 - create cognito user pool and auth settings with TF.
 - user creation notes
