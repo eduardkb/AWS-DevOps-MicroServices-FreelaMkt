@@ -81,3 +81,23 @@ resource "aws_resourcegroups_group" "frontend_group" {
 
   tags = var.shared_tags
 }
+
+resource "aws_resourcegroups_group" "ingress_group" {
+  name        = "${local.prj_initials}-ingress"
+  description = "All ingress resources tagged with FreelaMkp-Ingress"
+  resource_query {
+    type = "TAG_FILTERS_1_0"
+    
+    query = jsonencode({
+      ResourceTypeFilters = ["AWS::AllSupported"]
+      TagFilters = [
+        {
+          Key    = "id"
+          Values = ["${local.prj_initials}-ingress"]
+        }
+      ]
+    })
+  }
+
+  tags = var.shared_tags
+}
