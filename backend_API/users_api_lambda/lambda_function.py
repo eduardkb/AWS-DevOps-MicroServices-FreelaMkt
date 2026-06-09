@@ -97,6 +97,25 @@ def update_user():
         body=f'{{"message":"User updated"}}'
     )
 
+@app.get("/api/healthcheck")
+def healthcheck():
+    return Response(
+        status_code=200,
+        content_type="application/json",
+        body='{"message":"API up and running"}'
+    )
+
+
+@app.get("/api/getparam")
+def getparam():
+    return Response(
+        status_code=200,
+        content_type="application/json",
+        body=json.dumps({
+            "message": "parameters returned",
+            "parameters": app.current_event.to_dict()
+        })
+    )
 # ============================================================
 # Lambda Entry Point
 # ============================================================

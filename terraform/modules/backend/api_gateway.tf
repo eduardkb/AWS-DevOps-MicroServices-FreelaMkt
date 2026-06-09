@@ -69,6 +69,18 @@ resource "aws_apigatewayv2_route" "user_put_me" {
   target    = "integrations/${aws_apigatewayv2_integration.user.id}"
 }
 
+resource "aws_apigatewayv2_route" "user_healthcheck" {
+  api_id    = aws_apigatewayv2_api.http_api.id
+  route_key = "GET /api/user/healthcheck"
+  target    = "integrations/${aws_apigatewayv2_integration.user.id}"
+}
+
+resource "aws_apigatewayv2_route" "user_getparam" {
+  api_id    = aws_apigatewayv2_api.http_api.id
+  route_key = "GET /api/user/getparam"
+  target    = "integrations/${aws_apigatewayv2_integration.user.id}"
+}
+
 # SERVICE
 resource "aws_apigatewayv2_route" "service_post" {
   api_id    = aws_apigatewayv2_api.http_api.id
