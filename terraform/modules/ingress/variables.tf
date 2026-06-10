@@ -17,3 +17,13 @@ variable "cloudfront_secret_header" {
   type        = string
   sensitive   = true
 }
+
+variable "application_dns_zone" {
+  description = "DNS zone name for the application"
+  type        = string
+}
+
+variable "application_dns_prefix" {
+  description = "DNS prefix for the application"
+  type        = string
+}

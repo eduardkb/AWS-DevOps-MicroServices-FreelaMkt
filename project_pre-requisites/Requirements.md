@@ -93,3 +93,18 @@ aws iam create-service-linked-role \
   --aws-service-name ecs.amazonaws.com
 ```
 
+### DNS Configuration
+
+- Create a new Route53 Hosted Zone on the project's region.
+- The DNS Zone will be imported on ingress module.
+- So, on file `\terraform\global\variables.tf` change the variables:
+    - application_dns_zone
+    - application_dns_prefix
+
+- Export / Import Hosted Zone:
+- to export, execute command below in CLI:
+```sh
+aws route53 list-resource-record-sets \
+  --hosted-zone-id [zone-id] > route53-backup.json
+```
+- to import, this file cannot be used directly. It must be in a special format (BIND format). to do so, it has to be exported with tools like `cli53`.

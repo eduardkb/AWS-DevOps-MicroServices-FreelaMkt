@@ -18,3 +18,15 @@ variable "db_username" {
   type        = string
   default     = "pgmaster"
 }
+
+variable "application_dns_zone" {
+  description = "DNS zone name for the application"
+  type        = string
+  default     = "edukb.site"
+}
+
+variable "application_dns_prefix" {
+  description = "DNS prefix for the application"
+  type        = string
+  default     = "www"
+}

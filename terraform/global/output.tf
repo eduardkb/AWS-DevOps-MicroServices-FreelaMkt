@@ -13,3 +13,12 @@ output "shared_tags" {
 output "db_username" {
   value = var.db_username
 }
+
+
+output "application_dns_zone" {
+  value = var.application_dns_zone
+}
+
+output "application_dns_prefix" {
+  value = var.application_dns_prefix
+}

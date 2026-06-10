@@ -13,10 +13,12 @@ module "ingress" {
   project_initials = module.global.project_initials
   project_code     = module.global.project_code
   shared_tags      = module.global.shared_tags
+  application_dns_zone   = module.global.application_dns_zone
+  application_dns_prefix = module.global.application_dns_prefix
 
   api_gateway_invoke_url   = module.backend.api_gateway_invoke_url
   alb_dns_name             = module.frontend.alb_dns_name
-  cloudfront_secret_header = random_password.cloudfront_secret.result
+  cloudfront_secret_header = random_password.cloudfront_secret.result  
 
   depends_on = [module.frontend, module.backend]
 }
