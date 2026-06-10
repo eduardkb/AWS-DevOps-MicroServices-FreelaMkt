@@ -47,3 +47,21 @@ resource "aws_vpc_security_group_egress_rule" "fargate_to_vpce_https" {
   from_port   = 443
   to_port     = 443
 }
+########################################
+# Fargate - Route table 
+########################################
+# New private route table for Fargate
+resource "aws_route_table" "private_fargate" {
+  vpc_id = aws_vpc.this.id
+
+  tags = merge(var.shared_tags, {
+    id   = "${local.prj_initials}-network"
+    Name = "${local.prj_initials}-rt-private-fargate"
+  })
+}
+
+# Associate it with the Fargate subnet
+resource "aws_route_table_association" "fargate_a" {
+  subnet_id      = aws_subnet.private_fargate_a.id
+  route_table_id = aws_route_table.private_fargate.id
+}
