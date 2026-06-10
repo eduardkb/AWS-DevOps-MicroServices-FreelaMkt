@@ -30,7 +30,9 @@ module "frontend" {
   project_code                = module.global.project_code
   shared_tags                 = module.global.shared_tags
   acm_certificate_arn         = module.global.certificate_arn
-
+  application_dns_prefix      = module.global.application_dns_prefix
+  application_dns_zone        = module.global.application_dns_zone
+  
   # from network module
   fargate_subnet_a_id         = module.network.fargate_subnet_a_id 
   fargate_security_group_id   = module.network.fargate_security_group_id
@@ -47,6 +49,8 @@ module "backend" {
   project_initials = module.global.project_initials
   project_code     = module.global.project_code
   shared_tags      = module.global.shared_tags
+  application_dns_prefix = module.global.application_dns_prefix
+  application_dns_zone   = module.global.application_dns_zone
 
   # from network module
   lambda_subnet_a_id         = module.network.lambda_subnet_a_id

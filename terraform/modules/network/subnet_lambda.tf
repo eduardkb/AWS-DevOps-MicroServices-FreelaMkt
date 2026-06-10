@@ -38,14 +38,3 @@ resource "aws_security_group_rule" "lambda_to_rds" {
   security_group_id        = aws_security_group.lambda_sg.id
   source_security_group_id = aws_security_group.rds_sg.id
 }
-
-# Required so the Lambda can call Secrets Manager and KMS through VPC Interface Endpoints over HTTPS
-resource "aws_security_group_rule" "lambda_https_outbound" {
-  type              = "egress"
-  description       = "Lambda HTTPS outbound"
-  from_port         = 443
-  to_port           = 443
-  protocol          = "tcp"
-  security_group_id = aws_security_group.lambda_sg.id
-  cidr_blocks       = ["0.0.0.0/0"]
-}

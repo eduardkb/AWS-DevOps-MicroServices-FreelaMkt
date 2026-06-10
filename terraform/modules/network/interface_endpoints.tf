@@ -66,6 +66,15 @@ resource "aws_security_group_rule" "endpoint_from_lambda" {
   source_security_group_id = aws_security_group.lambda_sg.id
 }
 
+resource "aws_vpc_security_group_egress_rule" "lambda_to_endpoint" {
+  security_group_id            = aws_security_group.lambda_sg.id
+  description                  = "Lambda to VPC Interface Endpoints (Secrets Manager, KMS)"
+  ip_protocol                  = "tcp"
+  from_port                    = 443
+  to_port                      = 443
+  referenced_security_group_id = aws_security_group.interf_endpoint_sg.id
+}
+
 #############################################
 # Interface endpoint: ECR API
 #############################################
@@ -148,7 +157,7 @@ resource "aws_vpc_endpoint" "logs" {
 
 
 #############################################
-# Security group for ECR and Cloudwatch
+# Security group for ECR and Cloudwatch Endpoints
 #############################################
 
 resource "aws_security_group" "vpce_sg" {
@@ -170,13 +179,6 @@ resource "aws_security_group" "vpce_sg" {
     security_groups = [
       aws_security_group.fargate_sg.id
     ]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 

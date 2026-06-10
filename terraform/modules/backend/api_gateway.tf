@@ -1,3 +1,7 @@
+locals { 
+  fqdn = var.application_dns_prefix == "" ? var.application_dns_zone : "${var.application_dns_prefix}.${var.application_dns_zone}"
+}
+
 ############################
 # HTTP API Gateway (v2)
 ############################
@@ -9,7 +13,7 @@ resource "aws_apigatewayv2_api" "http_api" {
   cors_configuration {
     allow_origins = ["*"]
     allow_methods = ["GET", "POST", "PUT", "DELETE"]
-    allow_headers = ["*"]
+    allow_headers = ["Authorization", "Content-Type"]
   }
 
   tags = merge(

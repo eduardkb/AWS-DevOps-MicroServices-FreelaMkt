@@ -9,14 +9,12 @@ variable "alb_subnet_a_id" { type = string }
 variable "alb_subnet_b_id" { type = string }
 variable "alb_security_group_id" { type = string }
 variable "vpc_id" { type = string }
+variable "application_dns_prefix" {type = string }
+variable "application_dns_zone" { type = string }
+variable "acm_certificate_arn" { type = string }
 
 variable "cloudfront_secret_header" {
   description = "Secret header value; requests without it are blocked"
   type        = string
   sensitive   = true
-}
-
-variable "acm_certificate_arn" {
-  description = "Custom certificate ARN"
-  type = string
 }

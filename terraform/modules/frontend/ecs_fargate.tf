@@ -4,6 +4,7 @@ locals {
     file("${path.root}/../../../frontend_webApp/appVersion.env"),
     "APP_VERSION=", ""
   ))
+  API_FQDN = var.application_dns_prefix == "" ? "${var.application_dns_zone}/api" : "${var.application_dns_prefix}.${var.application_dns_zone}/api"
 }
 
 data "aws_region" "current" {}
@@ -91,9 +92,9 @@ resource "aws_ecs_task_definition" "webapp" {
       ]
 
       environment = [
-        { name = "FLASK_ENV",   value = "development" },
+        { name = "FLASK_ENV",   value = "production" },
         { name = "SECRET_KEY",  value = random_id.secret_key.hex },
-        { name = "API_URL",     value = "http://localhost:8080" },
+        { name = "API_URL",     value = local.API_FQDN },
         { name = "APP_VERSION", value = local.app_version }
       ]
 
