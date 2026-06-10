@@ -167,5 +167,5 @@ resource "aws_ecs_service" "webapp" {
     }
   )
 
-  depends_on = [ aws_lb_listener.http ]
+  depends_on = [ aws_lb_listener.https, aws_lb_listener.http_redirect ]
 }

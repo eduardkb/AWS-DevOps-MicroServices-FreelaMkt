@@ -8,7 +8,8 @@ resource "aws_cloudfront_distribution" "main_cf" {
   enabled         = true
   is_ipv6_enabled = true
   price_class     = "PriceClass_100"
-
+  aliases = [local.fqdn]
+  
   # Origin: API Gateway
   origin {
     origin_id   = local.cf_api_origin_id
@@ -35,7 +36,7 @@ resource "aws_cloudfront_distribution" "main_cf" {
     custom_origin_config {
       http_port              = 80
       https_port             = 443
-      origin_protocol_policy = "http-only"
+      origin_protocol_policy = "https-only"  # ← CloudFront will now use TLS to ALB
       origin_ssl_protocols   = ["TLSv1.2"]
     }
 
@@ -87,7 +88,9 @@ resource "aws_cloudfront_distribution" "main_cf" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = true
+    acm_certificate_arn      = var.acm_certificate_arn
+    ssl_support_method       = "sni-only"       # required for custom certs
+    minimum_protocol_version = "TLSv1.2_2021"   # disables TLS 1.0 / 1.1
   }
 
   tags = merge(

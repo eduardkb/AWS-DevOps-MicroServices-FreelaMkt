@@ -27,3 +27,8 @@ variable "application_dns_prefix" {
   description = "DNS prefix for the application"
   type        = string
 }
+
+variable "acm_certificate_arn" {
+  description = "Custom certificate ARN"
+  type = string
+}

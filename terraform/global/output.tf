@@ -22,3 +22,7 @@ output "application_dns_zone" {
 output "application_dns_prefix" {
   value = var.application_dns_prefix
 }
+
+output "certificate_arn" {
+  value = var.certificate_arn
+}

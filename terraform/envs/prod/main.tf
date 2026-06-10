@@ -10,11 +10,12 @@ module "global" {
 module "ingress" {
   source = "../../modules/ingress"
 
-  project_initials = module.global.project_initials
-  project_code     = module.global.project_code
-  shared_tags      = module.global.shared_tags
-  application_dns_zone   = module.global.application_dns_zone
-  application_dns_prefix = module.global.application_dns_prefix
+  project_initials        = module.global.project_initials
+  project_code            = module.global.project_code
+  shared_tags             = module.global.shared_tags
+  application_dns_zone    = module.global.application_dns_zone
+  application_dns_prefix  = module.global.application_dns_prefix
+  acm_certificate_arn     = module.global.certificate_arn
 
   api_gateway_invoke_url   = module.backend.api_gateway_invoke_url
   alb_dns_name             = module.frontend.alb_dns_name
@@ -25,9 +26,10 @@ module "ingress" {
 
 module "frontend" {
   source = "../../modules/frontend"
-  project_initials = module.global.project_initials
-  project_code     = module.global.project_code
-  shared_tags      = module.global.shared_tags
+  project_initials            = module.global.project_initials
+  project_code                = module.global.project_code
+  shared_tags                 = module.global.shared_tags
+  acm_certificate_arn         = module.global.certificate_arn
 
   # from network module
   fargate_subnet_a_id         = module.network.fargate_subnet_a_id 

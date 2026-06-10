@@ -3,6 +3,7 @@
 - remove default URL from cloudfront?
 - is there a resource without tags / default name?
 - create cognito user pool and auth settings with TF.
+- make network diagram of project and store in architecture folder and reference in architecture.md file
 - user creation notes
     - create user in AWS Cognito
     - if successfully created

@@ -30,3 +30,9 @@ variable "application_dns_prefix" {
   type        = string
   default     = "www"
 }
+
+variable "certificate_arn" {
+  description = "ARN of the TLS certificate"
+  type        = string
+  default     = "arn:aws:acm:us-east-1:217037953500:certificate/b2cea9a5-92e5-4b86-94d0-da234f086d69"
+}

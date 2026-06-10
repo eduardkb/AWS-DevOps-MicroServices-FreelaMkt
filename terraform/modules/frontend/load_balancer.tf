@@ -50,24 +50,30 @@ resource "aws_lb_target_group" "frontend" {
   )
 }
 
-# TODO: change to HTTPS listener with ACM certificate once we have a domain and cert set up
 #################################################
-# HTTP Listener (TEST ONLY)
+# HTTPS Listener :443 — primary listener
 #################################################
 
-resource "aws_lb_listener" "http" {
+resource "aws_lb_listener" "https" {
   load_balancer_arn = aws_lb.frontend.arn
-  port              = 80
-  protocol          = "HTTP"
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  certificate_arn   = var.acm_certificate_arn
 
+  # Default action: require the CloudFront secret header
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.frontend.arn
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Forbidden"
+      status_code  = "403"
+    }
   }
 }
 
-resource "aws_lb_listener_rule" "allow_cloudfront" {
-  listener_arn = aws_lb_listener.http.arn
+resource "aws_lb_listener_rule" "allow_cloudfront_https" {
+  listener_arn = aws_lb_listener.https.arn
   priority     = 1
 
   condition {
@@ -83,20 +89,21 @@ resource "aws_lb_listener_rule" "allow_cloudfront" {
   }
 }
 
-resource "aws_lb_listener_rule" "block_direct" {
-  listener_arn = aws_lb_listener.http.arn
-  priority     = 2
+#################################################
+# HTTP Listener :80 — redirect to HTTPS only
+#################################################
 
-  condition {
-    path_pattern { values = ["/*"] }
-  }
+resource "aws_lb_listener" "http_redirect" {
+  load_balancer_arn = aws_lb.frontend.arn
+  port              = 80
+  protocol          = "HTTP"
 
-  action {
-    type = "fixed-response"
-    fixed_response {
-      content_type = "text/plain"
-      message_body = "Forbidden"
-      status_code  = "403"
+  default_action {
+    type = "redirect"
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
     }
   }
 }

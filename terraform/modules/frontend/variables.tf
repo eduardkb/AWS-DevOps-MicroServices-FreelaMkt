@@ -15,3 +15,8 @@ variable "cloudfront_secret_header" {
   type        = string
   sensitive   = true
 }
+
+variable "acm_certificate_arn" {
+  description = "Custom certificate ARN"
+  type = string
+}

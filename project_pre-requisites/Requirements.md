@@ -145,3 +145,14 @@ Exported `edukb.site` zone:
 ```
 
 - to import, this file cannot be used directly. It must be in a special format (BIND format). to do so, it has to be exported with tools like `cli53`.
+
+### Import domain certificate for CloudFront.
+
+- Navigate to AWS Certificate Manager
+- Click add new certificate
+- fill all 3 certificate details field
+    - certificate.crt usually contains the "certificate body" (first section) and the certificate chain (rest of the "-----BEGIN CERTIFICATE-----" sections on same file)
+- click import certificate
+- Record the Certificate's ARN
+
+- go to file `\terraform\global\variables.tf` and input the recorded ARN on variable `certificate_arn`
