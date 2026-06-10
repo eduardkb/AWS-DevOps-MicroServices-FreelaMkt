@@ -39,11 +39,11 @@ resource "aws_vpc_security_group_ingress_rule" "fargate_from_alb" {
   referenced_security_group_id = aws_security_group.alb.id
 }
 
-resource "aws_vpc_security_group_egress_rule" "fargate_outbound" {
-  security_group_id = aws_security_group.fargate_sg.id
+resource "aws_vpc_security_group_egress_rule" "fargate_to_vpce_https" {
+  security_group_id            = aws_security_group.fargate_sg.id
+  referenced_security_group_id = aws_security_group.vpce_sg.id
 
-  description = "Allow all outbound traffic"
-  ip_protocol = "-1"
-
-  cidr_ipv4 = "0.0.0.0/0"
+  ip_protocol = "tcp"
+  from_port   = 443
+  to_port     = 443
 }
