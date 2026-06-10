@@ -1,6 +1,4 @@
-- API Gateway - validate cloudfront_secret_header on lambda
-    - write secret to lambda env. variables
-    - check with recieved parameter.
+- on alb and functions validate host header being the domain. so that clients can't access cloudfront directly.
 - test if cloudfront is exclusive. can I access API Gatewway or ALB?
 - remove default URL from cloudfront?
 - is there a resource without tags / default name?

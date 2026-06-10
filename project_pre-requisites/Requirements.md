@@ -107,4 +107,41 @@ aws iam create-service-linked-role \
 aws route53 list-resource-record-sets \
   --hosted-zone-id [zone-id] > route53-backup.json
 ```
+Exported `edukb.site` zone:
+```json
+{
+    "ResourceRecordSets": [
+        {
+            "Name": "edukb.site.",
+            "Type": "NS",
+            "TTL": 172800,
+            "ResourceRecords": [
+                {
+                    "Value": "ns-187.awsdns-23.com."
+                },
+                {
+                    "Value": "ns-1051.awsdns-03.org."
+                },
+                {
+                    "Value": "ns-1659.awsdns-15.co.uk."
+                },
+                {
+                    "Value": "ns-976.awsdns-58.net."
+                }
+            ]
+        },
+        {
+            "Name": "edukb.site.",
+            "Type": "SOA",
+            "TTL": 900,
+            "ResourceRecords": [
+                {
+                    "Value": "ns-187.awsdns-23.com. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400"
+                }
+            ]
+        }
+    ]
+}
+```
+
 - to import, this file cannot be used directly. It must be in a special format (BIND format). to do so, it has to be exported with tools like `cli53`.
