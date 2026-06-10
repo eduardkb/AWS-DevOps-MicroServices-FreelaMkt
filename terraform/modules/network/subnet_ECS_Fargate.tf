@@ -47,6 +47,21 @@ resource "aws_vpc_security_group_egress_rule" "fargate_to_vpce_https" {
   from_port   = 443
   to_port     = 443
 }
+
+data "aws_prefix_list" "s3" {
+  name = "com.amazonaws.us-east-1.s3"
+}
+
+resource "aws_vpc_security_group_egress_rule" "fargate_to_s3" {
+  security_group_id = aws_security_group.fargate_sg.id
+
+  ip_protocol = "tcp"
+  from_port   = 443
+  to_port     = 443
+
+  prefix_list_id = data.aws_prefix_list.s3.id
+}
+
 ########################################
 # Fargate - Route table 
 ########################################

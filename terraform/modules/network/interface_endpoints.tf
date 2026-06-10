@@ -171,15 +171,27 @@ resource "aws_security_group" "vpce_sg" {
       Name = "${local.prj_initials}-fargate-interface-sg"
     }
   )
+}
 
-  ingress {
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    security_groups = [
-      aws_security_group.fargate_sg.id
-    ]
-  }
+
+resource "aws_vpc_security_group_ingress_rule" "vpce_from_fargate" {
+  security_group_id            = aws_security_group.vpce_sg.id
+  referenced_security_group_id = aws_security_group.fargate_sg.id
+
+  description = "HTTPS from Fargate to VPC Endpoints (ECR, CloudWatch)"
+  ip_protocol = "tcp"
+  from_port   = 443
+  to_port     = 443
+}
+
+resource "aws_vpc_security_group_egress_rule" "vpce_to_fargate" {
+  security_group_id            = aws_security_group.vpce_sg.id
+  referenced_security_group_id = aws_security_group.fargate_sg.id
+
+  description = "Return HTTPS traffic from VPC Endpoints back to Fargate"
+  ip_protocol = "tcp"
+  from_port   = 443
+  to_port     = 443
 }
 
 #############################################
@@ -189,6 +201,18 @@ resource "aws_vpc_endpoint" "s3" {
   vpc_id            = aws_vpc.this.id
   service_name      = "com.amazonaws.${data.aws_region.current.region}.s3"
   vpc_endpoint_type = "Gateway"
+
+  # policy = jsonencode({
+  #   Version = "2012-10-17"
+  #   Statement = [
+  #     {
+  #       Effect    = "Allow"
+  #       Principal = "*"
+  #       Action    = ["s3:GetObject"]
+  #       Resource  = "arn:aws:s3:::prod-${data.aws_region.current.region}-starport-layer-bucket/*"
+  #     }
+  #   ]
+  # })
 
   route_table_ids = [
     aws_route_table.private_fargate.id
