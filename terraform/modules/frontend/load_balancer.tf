@@ -88,22 +88,3 @@ resource "aws_lb_listener_rule" "allow_cloudfront_https" {
     target_group_arn = aws_lb_target_group.frontend.arn
   }
 }
-
-#################################################
-# HTTP Listener :80 — redirect to HTTPS only
-#################################################
-
-resource "aws_lb_listener" "http_redirect" {
-  load_balancer_arn = aws_lb.frontend.arn
-  port              = 80
-  protocol          = "HTTP"
-
-  default_action {
-    type = "redirect"
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
-  }
-}
