@@ -4,7 +4,7 @@ locals {
     file("${path.root}/../../../frontend_webApp/appVersion.env"),
     "APP_VERSION=", ""
   ))
-  API_FQDN = var.application_dns_prefix == "" ? "${var.application_dns_zone}/api" : "${var.application_dns_prefix}.${var.application_dns_zone}/api"
+  API_FQDN = var.application_dns_prefix == "" ? "https://${var.application_dns_zone}/api" : "https://${var.application_dns_prefix}.${var.application_dns_zone}/api"
 }
 
 data "aws_region" "current" {}
