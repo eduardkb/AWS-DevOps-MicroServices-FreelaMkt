@@ -28,7 +28,10 @@ variable "application_dns_zone" {
 variable "application_dns_prefix" {
   description = "DNS prefix for the application"
   type        = string
-  default     = "" # if empty uses apex domain, otherwise subdomain (e.g. 'app' for app.edukb.site)
+  default     = "www" 
+  # if empty uses apex domain 
+  # (*.domanin.com certificate does not cover for domain.com address), 
+  # otherwise subdomain (e.g. 'app' for app.edukb.site)
 }
 
 variable "certificate_arn" {
