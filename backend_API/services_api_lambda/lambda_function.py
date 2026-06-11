@@ -105,7 +105,7 @@ def list_service():
         return auth_error
     
 
-    logger.info("GET /services request received")
+    logger.info("GET /service request received")
 
     connection = None
     cursor = None

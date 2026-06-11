@@ -85,8 +85,8 @@ freela_marketplace/
     ├── __init__.py          # App factory (create_app)
     ├── blueprints/
     │   ├── main.py          # "/" → All Services
-    │   ├── services.py      # /services/my
-    │   └── bookings.py      # /bookings/my
+    │   ├── services.py      # /service/my
+    │   └── bookings.py      # /booking/my
     ├── data/
     │   └── services.py      # Static fake data
     ├── static/
@@ -107,8 +107,8 @@ freela_marketplace/
 | URL | Tab |
 |---|---|
 | `/` | All Services (home) |
-| `/services/my` | My Services |
-| `/bookings/my` | My Bookings |
+| `/service/my` | My Services |
+| `/booking/my` | My Bookings |
 
 ---
 
@@ -116,4 +116,4 @@ freela_marketplace/
 
 - The **Login** button is present in the header but does not implement authentication yet.
 - **My Services** and **My Bookings** show an "Under Development" placeholder.
-- The services table displays 5 rows of static fake data defined in `app/data/services.py`.
+- The services table displays 5 rows of static fake data defined in `app/data/service.py`.

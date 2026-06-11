@@ -13,7 +13,7 @@ def index():
     )
 
 
-@main_bp.route("/api/services")
+@main_bp.route("/api/service")
 def api_services():
     api_url = os.environ.get("API_URL", "")
     try:

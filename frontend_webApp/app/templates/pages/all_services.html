@@ -69,7 +69,7 @@ function loadServices() {
   emptyEl.style.display = 'none';
   tableWrap.style.display = 'none';
 
-  fetch('/api/services')
+  fetch('/api/service')
     .then(function(res) { return res.json(); })
     .then(function(json) {
       loading.style.display = 'none';

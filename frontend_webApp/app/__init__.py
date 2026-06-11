@@ -21,7 +21,7 @@ def create_app(env: str = None) -> Flask:
     from app.blueprints.bookings import bookings_bp
 
     app.register_blueprint(main_bp)
-    app.register_blueprint(services_bp, url_prefix="/services")
-    app.register_blueprint(bookings_bp, url_prefix="/bookings")
+    app.register_blueprint(services_bp, url_prefix="/service")
+    app.register_blueprint(bookings_bp, url_prefix="/booking")
 
     return app
