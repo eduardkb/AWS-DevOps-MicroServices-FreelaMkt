@@ -5,14 +5,7 @@ priority is to generate the code requested code below.
 Always zip only the files that needed to be modified to the results.zip file and let me download it.
 
 Modifications:
-    - the appVersion.env file should have a "APP_VERSION" variable. 
-        - this variable (content example: 1.0.2) should be read
-        - then dinamically inserted into the footer in format "Developed by <strong>E.K.B</strong> - v1.0.2"
-    - read the "API_URL" from the environment variables
-        - for the "all services" table in "All Services" tab populate it with the result of the API call 
-        - for this table, API call should be made to <API_URL>+"/service"
-        - if the result is an error, display the error instead of the table.
-        - if the result is empty, display text "No services available to list"
-        - if there are results, they will be returned in format below:
-
-        {"success": true, "count": 5, "data": [{"id": "bbbbbbb1-aaaa-aaaa-aaaa-aaaaaaaaaaa1", "user_id": "aaaaaaa1-1111-1111-1111-111111111111", "title": "Logo Design", "description": "Professional logo creation", "price": "150.00", "created_at": "2026-06-09 21:05:35.925211"}, {"id": "bbbbbbb2-aaaa-aaaa-aaaa-aaaaaaaaaaa2", "user_id": "aaaaaaa2-2222-2222-2222-222222222222", "title": "Web Development", "description": "Full stack web development", "price": "1200.00", "created_at": "2026-06-09 21:05:35.925211"}, {"id": "bbbbbbb3-aaaa-aaaa-aaaa-aaaaaaaaaaa3", "user_id": "aaaaaaa3-3333-3333-3333-333333333333", "title": "SEO Optimization", "description": "SEO services for websites", "price": "300.00", "created_at": "2026-06-09 21:05:35.925211"}, {"id": "bbbbbbb4-aaaa-aaaa-aaaa-aaaaaaaaaaa4", "user_id": "aaaaaaa4-4444-4444-4444-444444444444", "title": "Video Editing", "description": "Professional video editing", "price": "450.00", "created_at": "2026-06-09 21:05:35.925211"}, {"id": "bbbbbbb5-aaaa-aaaa-aaaa-aaaaaaaaaaa5", "user_id": "aaaaaaa5-5555-5555-5555-555555555555", "title": "Mobile App Design", "description": "UI/UX for mobile apps", "price": "600.00", "created_at": "2026-06-09 21:05:35.925211"}]}
+    - Currently the container is freezing and not loading because the API call times out.
+    - make sure that timeout happens only after 60 seconds try.
+    - show the page no matter what before the api call and make the site show to the user that somehting is being done (placeholder blinking, progress bar or spinning wheel)
+    - if api fails, display message why it failed

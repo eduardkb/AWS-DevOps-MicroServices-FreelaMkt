@@ -9,12 +9,35 @@
 </section>
 
 <section class="table-section">
-  {% if error %}
-    <p class="error-message">{{ error }}</p>
-  {% elif empty %}
-    <p>No services available to list</p>
-  {% else %}
-  <div class="table-wrapper">
+  <!-- Loading state -->
+  <div id="services-loading" class="loading-state">
+    <div class="spinner"></div>
+    <p class="loading-label">Loading services…</p>
+    <div class="skeleton-rows">
+      <div class="skeleton-row"></div>
+      <div class="skeleton-row"></div>
+      <div class="skeleton-row"></div>
+      <div class="skeleton-row"></div>
+    </div>
+  </div>
+
+  <!-- Error state -->
+  <div id="services-error" class="error-banner" style="display:none;">
+    <span class="error-icon">⚠</span>
+    <div>
+      <strong>Failed to load services</strong>
+      <p id="services-error-msg" class="error-detail"></p>
+    </div>
+    <button class="btn-retry" onclick="loadServices()">Retry</button>
+  </div>
+
+  <!-- Empty state -->
+  <div id="services-empty" class="empty-state" style="display:none;">
+    <p>No services available to list.</p>
+  </div>
+
+  <!-- Data table -->
+  <div id="services-table-wrap" class="table-wrapper" style="display:none;">
     <table class="services-table" aria-label="Available services">
       <thead>
         <tr>
@@ -25,19 +48,63 @@
           <th>Created At</th>
         </tr>
       </thead>
-      <tbody>
-        {% for svc in services %}
-        <tr>
-          <td class="td-id">{{ loop.index }}</td>
-          <td class="td-title">{{ svc.title }}</td>
-          <td>{{ svc.description }}</td>
-          <td class="td-price">${{ svc.price }}</td>
-          <td>{{ svc.created_at }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
+      <tbody id="services-tbody"></tbody>
     </table>
   </div>
-  {% endif %}
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function loadServices() {
+  var loading = document.getElementById('services-loading');
+  var errorEl = document.getElementById('services-error');
+  var emptyEl = document.getElementById('services-empty');
+  var tableWrap = document.getElementById('services-table-wrap');
+  var tbody = document.getElementById('services-tbody');
+  var errorMsg = document.getElementById('services-error-msg');
+
+  loading.style.display = 'flex';
+  errorEl.style.display = 'none';
+  emptyEl.style.display = 'none';
+  tableWrap.style.display = 'none';
+
+  fetch('/api/services')
+    .then(function(res) { return res.json(); })
+    .then(function(json) {
+      loading.style.display = 'none';
+      if (!json.success) {
+        errorMsg.textContent = json.error || 'Unknown error.';
+        errorEl.style.display = 'flex';
+        return;
+      }
+      var data = json.data && json.data.data ? json.data.data : (Array.isArray(json.data) ? json.data : null);
+      if (!data || data.length === 0) {
+        emptyEl.style.display = 'block';
+        return;
+      }
+      tbody.innerHTML = data.map(function(svc, i) {
+        return '<tr>' +
+          '<td class="td-id">' + (i + 1) + '</td>' +
+          '<td class="td-title">' + escHtml(svc.title || '') + '</td>' +
+          '<td>' + escHtml(svc.description || '') + '</td>' +
+          '<td class="td-price">$' + escHtml(String(svc.price || '')) + '</td>' +
+          '<td>' + escHtml(svc.created_at || '') + '</td>' +
+          '</tr>';
+      }).join('');
+      tableWrap.style.display = 'block';
+    })
+    .catch(function(err) {
+      loading.style.display = 'none';
+      errorMsg.textContent = err.message || 'Network error. Could not reach the server.';
+      errorEl.style.display = 'flex';
+    });
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+loadServices();
+</script>
 {% endblock %}
