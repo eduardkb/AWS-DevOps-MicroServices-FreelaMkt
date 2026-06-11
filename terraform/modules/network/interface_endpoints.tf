@@ -184,14 +184,12 @@ resource "aws_vpc_security_group_ingress_rule" "vpce_from_fargate" {
   to_port     = 443
 }
 
-resource "aws_vpc_security_group_egress_rule" "vpce_to_fargate" {
-  security_group_id            = aws_security_group.vpce_sg.id
-  referenced_security_group_id = aws_security_group.fargate_sg.id
-
-  description = "Return HTTPS traffic from VPC Endpoints back to Fargate"
-  ip_protocol = "tcp"
-  from_port   = 443
-  to_port     = 443
+# Needed so that ECS can get images from ECR via the VPC endpoints
+resource "aws_vpc_security_group_egress_rule" "vpce_egress_all" {
+  security_group_id = aws_security_group.vpce_sg.id
+  description       = "Allow all outbound from VPC endpoints"
+  ip_protocol       = "-1"   # all traffic
+  cidr_ipv4         = "0.0.0.0/0"
 }
 
 #############################################
