@@ -638,7 +638,7 @@ body {
   border-radius: 14px;
   padding: 2.5rem 2rem;
   width: 100%;
-  max-width: 440px;
+  max-width: 960px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.06);
 }
 .form-title {

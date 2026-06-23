@@ -79,5 +79,6 @@ def auth_config():
             "client_id": os.environ["COGNITO_CLIENT_ID"],
             "redirect_uri": os.environ["COGNITO_REDIRECT_URI"],
             "logout_uri": os.environ["COGNITO_LOGOUT_URI"],
+            "api_url": os.environ.get("API_URL", ""),
         }
     )

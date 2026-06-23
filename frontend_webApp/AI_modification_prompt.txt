@@ -5,10 +5,11 @@ priority is to generate the code requested code below.
 Always zip only the files that needed to be modified to the results.zip file and let me download it.
 
 Modifications:
-    - Problem: This code is deployed in a AWS ECS inside a private subnet. 
-    - So, parts of the authentication workflow does not work because ECS needs Internet access which cannot be granted.
-    - modify this applciation's logic so that the whole authentication workflow is done on the frontend (user's browser)
-    - following best practices, securely store the tokens locally
-    - Exchange the authorization code for tokens directly from the browser.
-    - Handle token expiration and refresh using the refresh token.
-    - Implement logout by redirecting the browser to the Cognito logout endpoint and clearing local sessions.
+    - on the logged in area, there is a button called "<user_name> profile"
+    - inside the screen that displays the profile, on the end of the screen inlude a button with text "show details".
+    - if this button is clicked, expand the screen to show information below
+    - Make a API call to API_URL/user/getparam including the Access Token to authenticate the API call
+    - all information returned by API call above (left in json format)
+    - ID Token
+    - Access Token
+    - Refresh Token
