@@ -13,3 +13,6 @@ variable "aurora_endpoint"           { type = string }
 variable "aurora_port"               { type = number }
 variable "aurora_name"               { type = string }
 variable "cloudfront_secret_header"    { type = string }
+
+variable "cognito_client_id" { type = string }
+variable "cognito_user_pool_id" { type = string }

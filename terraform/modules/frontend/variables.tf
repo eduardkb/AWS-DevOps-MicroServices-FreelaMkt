@@ -18,3 +18,8 @@ variable "cloudfront_secret_header" {
   type        = string
   sensitive   = true
 }
+
+variable "cognito_client_id" { type = string }
+variable "cognito_domain" { type = string }
+variable "cognito_redirect_uri" { type = string }
+variable "cognito_logout_uri" { type = string }

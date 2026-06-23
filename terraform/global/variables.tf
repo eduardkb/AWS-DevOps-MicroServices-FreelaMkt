@@ -39,3 +39,23 @@ variable "certificate_arn" {
   type        = string
   default     = "arn:aws:acm:us-east-1:217037953500:certificate/b2cea9a5-92e5-4b86-94d0-da234f086d69"
 }
+
+variable "cognito_client_id" {
+  default = "l92tb04q2e84ga98lfg0kocdt"
+}
+
+variable "cognito_domain" {
+  default = "https://us-east-1udshbayhc.auth.us-east-1.amazoncognito.com"
+}
+
+variable "cognito_redirect_uri" {
+  default = "http://127.0.0.1/auth/callback"
+}
+
+variable "cognito_logout_uri" {
+  default = "http://127.0.0.1"
+}
+
+variable "cognito_user_pool_id" {
+  default = "us-east-1_uDShbAYhC"
+}

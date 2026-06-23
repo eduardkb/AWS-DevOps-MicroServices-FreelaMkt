@@ -32,6 +32,10 @@ module "frontend" {
   acm_certificate_arn         = module.global.certificate_arn
   application_dns_prefix      = module.global.application_dns_prefix
   application_dns_zone        = module.global.application_dns_zone
+  cognito_client_id           = module.global.cognito_client_id
+  cognito_domain              = module.global.cognito_domain
+  cognito_logout_uri          = module.global.cognito_logout_uri
+  cognito_redirect_uri        = module.global.cognito_redirect_uri
   
   # from network module
   fargate_subnet_a_id         = module.network.fargate_subnet_a_id 
@@ -51,6 +55,8 @@ module "backend" {
   shared_tags      = module.global.shared_tags
   application_dns_prefix = module.global.application_dns_prefix
   application_dns_zone   = module.global.application_dns_zone
+  cognito_client_id = module.global.cognito_client_id
+  cognito_user_pool_id = module.global.cognito_user_pool_id
 
   # from network module
   lambda_subnet_a_id         = module.network.lambda_subnet_a_id

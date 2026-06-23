@@ -26,6 +26,29 @@ resource "aws_apigatewayv2_api" "http_api" {
 }
 
 ############################
+# JWT Authorizer
+############################
+data "aws_region" "current" {}
+
+resource "aws_apigatewayv2_authorizer" "cognito_authorizer" {
+  api_id          = aws_apigatewayv2_api.http_api.id  
+  name            = "cognito-jwt"
+  authorizer_type = "JWT"
+
+  identity_sources = [
+    "$request.header.Authorization"
+  ]
+
+  jwt_configuration {
+    audience = [
+      var.cognito_client_id      
+    ]
+
+    issuer = "https://cognito-idp.${data.aws_region.current.region}.amazonaws.com/${var.cognito_user_pool_id}"
+  }
+}
+
+############################
 # Lambda Integrations
 ############################
 
@@ -59,30 +82,45 @@ resource "aws_apigatewayv2_route" "user_post" {
   api_id    = aws_apigatewayv2_api.http_api.id
   route_key = "POST /api/user"
   target    = "integrations/${aws_apigatewayv2_integration.user.id}"
+
+  authorization_type = "JWT"
+  authorizer_id = aws_apigatewayv2_authorizer.cognito_authorizer.id
 }
 
 resource "aws_apigatewayv2_route" "user_get_me" {
   api_id    = aws_apigatewayv2_api.http_api.id
   route_key = "GET /api/user/me"
   target    = "integrations/${aws_apigatewayv2_integration.user.id}"
+
+  authorization_type = "JWT"
+  authorizer_id = aws_apigatewayv2_authorizer.cognito_authorizer.id
 }
 
 resource "aws_apigatewayv2_route" "user_put_me" {
   api_id    = aws_apigatewayv2_api.http_api.id
   route_key = "PUT /api/user/me"
   target    = "integrations/${aws_apigatewayv2_integration.user.id}"
+
+  authorization_type = "JWT"
+  authorizer_id = aws_apigatewayv2_authorizer.cognito_authorizer.id
 }
 
 resource "aws_apigatewayv2_route" "user_healthcheck" {
   api_id    = aws_apigatewayv2_api.http_api.id
   route_key = "GET /api/user/healthcheck"
   target    = "integrations/${aws_apigatewayv2_integration.user.id}"
+  
+  authorization_type = "JWT"
+  authorizer_id = aws_apigatewayv2_authorizer.cognito_authorizer.id
 }
 
 resource "aws_apigatewayv2_route" "user_getparam" {
   api_id    = aws_apigatewayv2_api.http_api.id
   route_key = "GET /api/user/getparam"
   target    = "integrations/${aws_apigatewayv2_integration.user.id}"
+
+  authorization_type = "JWT"
+  authorizer_id = aws_apigatewayv2_authorizer.cognito_authorizer.id
 }
 
 # SERVICE
@@ -90,6 +128,9 @@ resource "aws_apigatewayv2_route" "service_post" {
   api_id    = aws_apigatewayv2_api.http_api.id
   route_key = "POST /api/service"
   target    = "integrations/${aws_apigatewayv2_integration.service.id}"
+
+  authorization_type = "JWT"
+  authorizer_id = aws_apigatewayv2_authorizer.cognito_authorizer.id
 }
 
 resource "aws_apigatewayv2_route" "service_get_all" {
@@ -102,18 +143,27 @@ resource "aws_apigatewayv2_route" "service_get_by_id" {
   api_id    = aws_apigatewayv2_api.http_api.id
   route_key = "GET /api/service/{id}"
   target    = "integrations/${aws_apigatewayv2_integration.service.id}"
+
+  authorization_type = "JWT"
+  authorizer_id = aws_apigatewayv2_authorizer.cognito_authorizer.id
 }
 
 resource "aws_apigatewayv2_route" "service_put" {
   api_id    = aws_apigatewayv2_api.http_api.id
   route_key = "PUT /api/service/{id}"
   target    = "integrations/${aws_apigatewayv2_integration.service.id}"
+
+  authorization_type = "JWT"
+  authorizer_id = aws_apigatewayv2_authorizer.cognito_authorizer.id
 }
 
 resource "aws_apigatewayv2_route" "service_delete" {
   api_id    = aws_apigatewayv2_api.http_api.id
   route_key = "DELETE /api/service/{id}"
   target    = "integrations/${aws_apigatewayv2_integration.service.id}"
+
+  authorization_type = "JWT"
+  authorizer_id = aws_apigatewayv2_authorizer.cognito_authorizer.id
 }
 
 # BOOKING
@@ -121,18 +171,27 @@ resource "aws_apigatewayv2_route" "booking_post" {
   api_id    = aws_apigatewayv2_api.http_api.id
   route_key = "POST /api/booking"
   target    = "integrations/${aws_apigatewayv2_integration.booking.id}"
+
+  authorization_type = "JWT"
+  authorizer_id = aws_apigatewayv2_authorizer.cognito_authorizer.id
 }
 
 resource "aws_apigatewayv2_route" "booking_get" {
   api_id    = aws_apigatewayv2_api.http_api.id
   route_key = "GET /api/booking"
   target    = "integrations/${aws_apigatewayv2_integration.booking.id}"
+
+  authorization_type = "JWT"
+  authorizer_id = aws_apigatewayv2_authorizer.cognito_authorizer.id
 }
 
 resource "aws_apigatewayv2_route" "booking_update_status" {
   api_id    = aws_apigatewayv2_api.http_api.id
   route_key = "PUT /api/booking/{id}/status"
   target    = "integrations/${aws_apigatewayv2_integration.booking.id}"
+
+  authorization_type = "JWT"
+  authorizer_id = aws_apigatewayv2_authorizer.cognito_authorizer.id
 }
 
 ############################

@@ -95,7 +95,11 @@ resource "aws_ecs_task_definition" "webapp" {
         { name = "FLASK_ENV",   value = "production" },
         { name = "SECRET_KEY",  value = random_id.secret_key.hex },
         { name = "API_URL",     value = local.API_FQDN },
-        { name = "APP_VERSION", value = local.app_version }
+        { name = "APP_VERSION", value = local.app_version },
+        { name = "COGNITO_CLIENT_ID", value = var.cognito_client_id },
+        { name = "COGNITO_DOMAIN", value = var.cognito_domain },
+        { name = "COGNITO_REDIRECT_URI", value = var.cognito_redirect_uri },
+        { name = "COGNITO_LOGOUT_URI", value = var.cognito_logout_uri }
       ]
 
       logConfiguration = {

@@ -26,3 +26,23 @@ output "application_dns_prefix" {
 output "certificate_arn" {
   value = var.certificate_arn
 }
+
+output "cognito_client_id" {
+  value = var.cognito_client_id
+}
+
+output "cognito_domain" {
+  value = var.cognito_domain
+}
+
+output "cognito_redirect_uri" {
+  value = var.cognito_redirect_uri
+}
+
+output "cognito_logout_uri" {
+  value = var.cognito_logout_uri
+}
+
+output "cognito_user_pool_id" {
+  value = var.cognito_user_pool_id
+}

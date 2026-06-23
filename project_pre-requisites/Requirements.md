@@ -161,20 +161,21 @@ Exported `edukb.site` zone:
 
 Needed to authenticate web app users and API callers
 
-TODO: change to SPA?????
-TODO: FRONTEND CODE GOOD FOR PRODUCTION?
-
-- Create as "Traditional web applciation"
+- Create as "Single Page Application (SPA)" to use "Authorization Code Flow with PKCE" auth flow that does not need client secret
 - Name the application (Suggestion: "FreelaMktApp")
-- Configure deatails and return URL 
+- Configure details and return URL 
 - Confirm user pool creation
-- On Cognito -> User Pool -> App Clients -> Login Page
+- On Cognito -> User Pool -> App Clients -> Login Page -> Managed login pages configuration -> Edit
     - Insert correct "Allowed callback URLs"
     - Insert correct "Allowed sign-out URLs"
     - Make sure "OAuth 2.0 grant types" equals to "Authorization code grant"
     - Make sure "OpenID Connect scopes" contain at least "openid email profile"
     - Save Changes
+- Inside App Client click "View Login Page" and make sure the login page appears correctly. if not, configure it under Branding -> Managed Login -> Styles.
 
-
-- TODO : import cognito as resource in TF and use its parameters on API Gateway and ECS Web APP?  
-- 
+- Update Terraform file `\terraform\global\variables.tf` with Cognito identifiers:
+    - `cognito_client_id` = inside user pool -> app client
+    - `cognito_domain` = inside user pool -> branding - Domain
+    - `cognito_redirect_uri` = inside user pool -> app client -> login pages
+    - `cognito_logout_uri` = inside user pool -> app client -> login pages
+    - `cognito_user_pool_id` = inside user pool overview page
