@@ -61,7 +61,7 @@ Core Services:
 
 ---
 
-### Phase 4 - API Gateway
+### Phase 4 - API Gateway [COMPLETED]
 - Create HTTP API Gateway
 - Define routes (/api/*)
 - Integrate with Lambda functions
@@ -71,7 +71,7 @@ Core Services:
 
 ---
 
-### Phase 5 - Frontend (Next.js on Fargate)
+### Phase 5 - Frontend (Next.js on Fargate) [COMPLETED]
 - Develop Next.js application:
   - Authentication pages
   - Marketplace listing
@@ -82,7 +82,7 @@ Core Services:
 
 ---
 
-### Phase 6 - Application Load Balancer (ALB)
+### Phase 6 - Application Load Balancer (ALB) [COMPLETED]
 - Create ALB
 - Configure listeners (HTTP/HTTPS)
 - Set routing to Fargate services
@@ -91,7 +91,7 @@ Core Services:
 
 ---
 
-### Phase 7 - CloudFront CDN
+### Phase 7 - CloudFront CDN [COMPLETED]
 - Create CloudFront distribution
 - Configure origins:
   - ALB (frontend)
@@ -102,7 +102,7 @@ Core Services:
 
 ---
 
-### Phase 8 - Route 53 DNS
+### Phase 8 - Route 53 DNS [COMPLETED]
 - Register or configure domain
 - Create hosted zone
 - Add DNS records pointing to CloudFront
@@ -136,7 +136,7 @@ Core Services:
 
 ---
 
-### Phase 11 - Authentication (Cognito)
+### Phase 11 - Authentication (Cognito) [COMPLETED]
 - Create Cognito User Pool
 - Configure app clients
 - Implement:
