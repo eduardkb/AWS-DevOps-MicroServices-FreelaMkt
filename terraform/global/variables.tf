@@ -53,7 +53,7 @@ variable "cognito_redirect_uri" {
 }
 
 variable "cognito_logout_uri" {
-  default = "https://www.edukb.site/127.0.0.1"
+  default = "https://www.edukb.site"
 }
 
 variable "cognito_user_pool_id" {
