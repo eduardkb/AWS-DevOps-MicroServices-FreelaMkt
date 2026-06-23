@@ -108,10 +108,7 @@ resource "aws_apigatewayv2_route" "user_put_me" {
 resource "aws_apigatewayv2_route" "user_healthcheck" {
   api_id    = aws_apigatewayv2_api.http_api.id
   route_key = "GET /api/user/healthcheck"
-  target    = "integrations/${aws_apigatewayv2_integration.user.id}"
-  
-  authorization_type = "JWT"
-  authorizer_id = aws_apigatewayv2_authorizer.cognito_authorizer.id
+  target    = "integrations/${aws_apigatewayv2_integration.user.id}"  
 }
 
 resource "aws_apigatewayv2_route" "user_getparam" {

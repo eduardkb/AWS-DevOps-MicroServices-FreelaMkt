@@ -1,3 +1,5 @@
+- on terraform change ECS env. variables to domain, not localhost and add this redirect url to cognito.
+
 - on alb and functions validate host header being the domain. so that clients can't access cloudfront directly.
 - test if cloudfront is exclusive. can I access API Gatewway or ALB?
 - is there a resource without tags / default name?
