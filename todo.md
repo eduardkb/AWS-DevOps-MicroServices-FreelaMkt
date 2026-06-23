@@ -1,7 +1,7 @@
 - on alb and functions validate host header being the domain. so that clients can't access cloudfront directly.
 - test if cloudfront is exclusive. can I access API Gatewway or ALB?
 - is there a resource without tags / default name?
-- create cognito user pool and auth settings with TF.
+- create cognito user pool and auth settings
 - make network diagram of project and store in architecture folder and reference in architecture.md file
 - user creation notes
     - create user in AWS Cognito

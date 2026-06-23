@@ -5,7 +5,8 @@ priority is to generate the code requested code below.
 Always zip only the files that needed to be modified to the results.zip file and let me download it.
 
 Modifications:
-    - Currently the container is freezing and not loading because the API call times out.
-    - make sure that timeout happens only after 60 seconds try.
-    - show the page no matter what before the api call and make the site show to the user that somehting is being done (placeholder blinking, progress bar or spinning wheel)
-    - if api fails, display message why it failed
+    - This app is working ok the way it is.
+    - verify if this is following production grade best practices and modify anything that needs to be modified to make it production grade including removing unnecessary or dangerous logs.
+    - when logged out, a button wih text "Create Account" should be displayed. (It disappears when a user is logged in)
+    - the button "Create account" should redirect to a placeholder form to register users.
+    - the existing button "<user> profile" is currently logging the user off apparently since it redirects to the home page and the button "login" is shown again. this button, when clicked should go to a new form filled out with the user's information. make this page a placeholder for now. Don't write changing logic.

@@ -156,3 +156,25 @@ Exported `edukb.site` zone:
 - Record the Certificate's ARN
 
 - go to file `\terraform\global\variables.tf` and input the recorded ARN on variable `certificate_arn`
+
+### Create Amazon Cognito user pool
+
+Needed to authenticate web app users and API callers
+
+TODO: change to SPA?????
+TODO: FRONTEND CODE GOOD FOR PRODUCTION?
+
+- Create as "Traditional web applciation"
+- Name the application (Suggestion: "FreelaMktApp")
+- Configure deatails and return URL 
+- Confirm user pool creation
+- On Cognito -> User Pool -> App Clients -> Login Page
+    - Insert correct "Allowed callback URLs"
+    - Insert correct "Allowed sign-out URLs"
+    - Make sure "OAuth 2.0 grant types" equals to "Authorization code grant"
+    - Make sure "OpenID Connect scopes" contain at least "openid email profile"
+    - Save Changes
+
+
+- TODO : import cognito as resource in TF and use its parameters on API Gateway and ECS Web APP?  
+- 

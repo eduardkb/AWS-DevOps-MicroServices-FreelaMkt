@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %} - Create Account{% endblock %}
+
+{% block content %}
+<div class="form-page">
+  <div class="form-card">
+    <h1 class="form-title">Create Account</h1>
+    <p class="form-subtitle">Join Freela Marketplace</p>
+
+    <div class="form-group">
+      <label class="form-label" for="fullname">Full Name</label>
+      <input class="form-input" type="text" id="fullname" name="fullname" placeholder="Your full name" disabled />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="email">Email</label>
+      <input class="form-input" type="email" id="email" name="email" placeholder="you@example.com" disabled />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="password">Password</label>
+      <input class="form-input" type="password" id="password" name="password" placeholder="••••••••" disabled />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="confirm_password">Confirm Password</label>
+      <input class="form-input" type="password" id="confirm_password" name="confirm_password" placeholder="••••••••" disabled />
+    </div>
+
+    <button class="btn-submit" type="button" disabled>Create Account</button>
+
+    <p class="form-footer">
+      Already have an account? <a href="{{ url_for('auth.login') }}">Login</a>
+    </p>
+
+    <p class="form-placeholder-notice">⚠ Registration is not yet available. This is a placeholder.</p>
+  </div>
+</div>
+{% endblock %}
