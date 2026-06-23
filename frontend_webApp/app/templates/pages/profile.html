@@ -9,17 +9,17 @@
 
     <div class="form-group">
       <label class="form-label" for="fullname">Full Name</label>
-      <input class="form-input" type="text" id="fullname" name="fullname" value="{{ user.get('name', '') }}" disabled />
+      <input class="form-input" type="text" id="fullname" name="fullname" value="" disabled />
     </div>
 
     <div class="form-group">
       <label class="form-label" for="email">Email</label>
-      <input class="form-input" type="email" id="email" name="email" value="{{ user.get('email', '') }}" disabled />
+      <input class="form-input" type="email" id="email" name="email" value="" disabled />
     </div>
 
     <div class="form-group">
       <label class="form-label" for="sub">User ID</label>
-      <input class="form-input" type="text" id="sub" name="sub" value="{{ user.get('sub', '') }}" disabled />
+      <input class="form-input" type="text" id="sub" name="sub" value="" disabled />
     </div>
 
     <button class="btn-submit" type="button" disabled>Save Changes</button>
@@ -27,4 +27,20 @@
     <p class="form-placeholder-notice">⚠ Profile editing is not yet available. This is a placeholder.</p>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const user = Auth.getUser();
+    if (!user) {
+      // Not authenticated — redirect to login
+      window.location.replace("/auth/login");
+      return;
+    }
+    document.getElementById("fullname").value = user.name || "";
+    document.getElementById("email").value   = user.email || "";
+    document.getElementById("sub").value     = user.sub || "";
+  });
+</script>
 {% endblock %}

@@ -30,8 +30,8 @@ variable "application_dns_prefix" {
   type        = string
   default     = "www" 
   # if empty uses apex domain 
-  # (*.domanin.com certificate does not cover for domain.com address), 
   # otherwise subdomain (e.g. 'app' for app.edukb.site)
+  # ATTENTION: (*.domanin.com certificate does not cover for domain.com address), 
 }
 
 variable "certificate_arn" {

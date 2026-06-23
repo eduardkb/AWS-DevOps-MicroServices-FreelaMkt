@@ -5,8 +5,10 @@ priority is to generate the code requested code below.
 Always zip only the files that needed to be modified to the results.zip file and let me download it.
 
 Modifications:
-    - This app is working ok the way it is.
-    - verify if this is following production grade best practices and modify anything that needs to be modified to make it production grade including removing unnecessary or dangerous logs.
-    - when logged out, a button wih text "Create Account" should be displayed. (It disappears when a user is logged in)
-    - the button "Create account" should redirect to a placeholder form to register users.
-    - the existing button "<user> profile" is currently logging the user off apparently since it redirects to the home page and the button "login" is shown again. this button, when clicked should go to a new form filled out with the user's information. make this page a placeholder for now. Don't write changing logic.
+    - Problem: This code is deployed in a AWS ECS inside a private subnet. 
+    - So, parts of the authentication workflow does not work because ECS needs Internet access which cannot be granted.
+    - modify this applciation's logic so that the whole authentication workflow is done on the frontend (user's browser)
+    - following best practices, securely store the tokens locally
+    - Exchange the authorization code for tokens directly from the browser.
+    - Handle token expiration and refresh using the refresh token.
+    - Implement logout by redirecting the browser to the Cognito logout endpoint and clearing local sessions.
