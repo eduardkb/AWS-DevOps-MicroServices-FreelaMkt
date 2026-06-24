@@ -5,7 +5,7 @@ locals {
 # creating a common layer for shared dependencies (psycopg2-binary and boto3) to optimize Lambda package size and deployment time
 data "archive_file" "shared_layer_zip" {
   type        = "zip"
-  source_dir = "${path.root}/../../../backend_API/shared_layer/python"
+  source_dir  = "${path.root}/../../../backend_API/shared_layer"
   output_path = "${path.module}/shared_layer.zip"
 }
 
