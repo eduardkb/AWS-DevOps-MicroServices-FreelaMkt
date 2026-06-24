@@ -118,6 +118,7 @@
         name: claims.name || claims["cognito:username"] || claims.email || "User",
         email: claims.email || "",
         sub: claims.sub || "",
+        groups: claims["cognito:groups"] || [],
       };
       sessionSet(STORAGE_KEYS.USER, JSON.stringify(user));
     }

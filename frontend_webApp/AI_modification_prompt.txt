@@ -5,11 +5,5 @@ priority is to generate the code requested below.
 Always zip only the files that needed to be modified to the results.zip file and let me download it.
 
 Modifications:
-    - on the logged in area, there is a button called "<user_name> profile"
-    - inside the screen that displays the profile, on the end of the screen inlude a button with text "show details".
-    - if this button is clicked, expand the screen to show information below
-    - Make a API call to API_URL/user/getparam including the Access Token to authenticate the API call
-    - all information returned by API call above (left in json format)
-    - ID Token
-    - Access Token
-    - Refresh Token
+    - the ID token contains claim: "cognito:groups": [    "user"  ],
+    - in the "my profile" screen, the "show details" button should not be shown unless the "admin" permission is present inside the groups claim.

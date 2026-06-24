@@ -1,4 +1,9 @@
-- instead of cloudfront_secret compared on lambda function, do "Lambda Authorizer in HTTP API Gateway"
+API Test CURL:
+curl -X GET "https://www.edukb.site/api/user/getparam" `
+  -H "Authorization: Bearer XXXXX" `
+  -H "x-cloudfront-secret: XXXXX"
+====
+
 - cognito add a admin user. add admin group all other users are user group.
     - if admin group, he can see profile parameters. if not, he can't.
     - if no group, can't call protected APIs

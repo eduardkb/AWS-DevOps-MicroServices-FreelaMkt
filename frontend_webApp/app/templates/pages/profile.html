@@ -75,6 +75,12 @@
     document.getElementById("email").value   = user.email || "";
     document.getElementById("sub").value     = user.sub || "";
 
+    const isAdmin = Array.isArray(user.groups) && user.groups.includes("admin");
+    if (!isAdmin) {
+      const btnWrapper = document.getElementById("btn-show-details").closest("div");
+      if (btnWrapper) btnWrapper.style.display = "none";
+    }
+
     let detailsLoaded = false;
 
     document.getElementById("btn-show-details").addEventListener("click", async function () {
