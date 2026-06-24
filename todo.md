@@ -3,11 +3,6 @@ curl -X GET "https://www.edukb.site/api/user/getparam" `
   -H "Authorization: Bearer XXXXX" `
   -H "x-cloudfront-secret: XXXXX"
 ====
-
-- cognito add a admin user. add admin group all other users are user group.
-    - if admin group, he can see profile parameters. if not, he can't.
-    - if no group, can't call protected APIs
-
 - Design service and booking workings and update RDS tables if needed
     - done. below is a full description.
 - Code FrontEnd User section. 

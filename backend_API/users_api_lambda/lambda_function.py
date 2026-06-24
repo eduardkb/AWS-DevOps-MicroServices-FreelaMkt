@@ -4,6 +4,7 @@ import json
 import uuid
 import boto3
 import psycopg2
+import jwt
 
 from aws_lambda_powertools import Logger # type: ignore
 from aws_lambda_powertools.event_handler import APIGatewayHttpResolver # type: ignore
@@ -101,6 +102,7 @@ def access_validation():
     )
 
     # Validate access tokenclaim
+    print(jwt.__version__)
     if authorization:
         if authorization.lower().startswith("bearer "):
             token = authorization[7:].strip()
@@ -130,13 +132,13 @@ def access_validation():
                     body='{"message":"Forbidden. API access is denied. Contact a administrator."}'
                 )
 
-        except Exception:
-            logger.warning("Invalid access token received")
+        except Exception as e:
+            logger.exception("Failed to decode token")
 
             return Response(
                 status_code=403,
                 content_type="application/json",
-                body='{"message":"Forbidden. API access is denied. Contact a administrator."}'
+                body='{"message":"Forbidden. API access is denied."}'
             )
 
     return None
