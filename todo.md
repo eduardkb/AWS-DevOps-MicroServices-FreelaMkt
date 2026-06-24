@@ -1,10 +1,10 @@
 - instead of cloudfront_secret compared on lambda function, do "Lambda Authorizer in HTTP API Gateway"
 - cognito add a admin user. add admin group all other users are user group.
     - if admin group, he can see profile parameters. if not, he can't.
+    - if no group, can't call protected APIs
 
 - Design service and booking workings and update RDS tables if needed
     - done. below is a full description.
-- Code all APIs including validation logic
 - Code FrontEnd User section. 
     - create user in cognito
     - join cognito with user table using "cognito_sub" parameter

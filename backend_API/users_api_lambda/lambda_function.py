@@ -74,29 +74,70 @@ def get_db_connection():
 
 
 # ============================================================
-# CloudFront Header Validation Helper
+# Access Validation Helper
 # ============================================================
 
-def validate_cloudfront_secret():
+def access_validation():    
     expected_secret = os.environ.get("CLOUDFRONT_SECRET_HEADER")
-
-    header_value = (
-        app.current_event.get_header_value(
-            name="x-cloudfront-secret",
-            default_value=None
-        )
+    
+    header_value = app.current_event.get_header_value(
+        name="x-cloudfront-secret",
+        default_value=None
     )
 
+    # Validate cloudfront secret
     if not expected_secret or header_value != expected_secret:
-        logger.warning(
-            "Invalid CloudFront secret header received"
-        )
+        logger.warning("Invalid CloudFront secret header received")
 
         return Response(
             status_code=403,
             content_type="application/json",
-            body='{"message":"Forbidden"}'
+            body='{"message":"Forbidden. Invalid request source."}'
         )
+    
+    authorization = app.current_event.get_header_value(
+        name="authorization",
+        default_value=None
+    )
+
+    # Validate access tokenclaim
+    if authorization:
+        if authorization.lower().startswith("bearer "):
+            token = authorization[7:].strip()
+        else:
+            token = authorization.strip()
+
+        try:
+            # Decode without verifying the signature.            
+            claims = jwt.decode(
+                token,
+                options={"verify_signature": False}
+            )
+
+            groups = claims.get("cognito:groups", [])
+
+            if (
+                not isinstance(groups, list)
+                or not any(group in ("admin", "user") for group in groups)
+            ):
+                logger.warning(
+                    "Access denied. Missing or invalid Cognito group."
+                )
+
+                return Response(
+                    status_code=403,
+                    content_type="application/json",
+                    body='{"message":"Forbidden. API access is denied. Contact a administrator."}'
+                )
+
+        except Exception:
+            logger.warning("Invalid access token received")
+
+            return Response(
+                status_code=403,
+                content_type="application/json",
+                body='{"message":"Forbidden. API access is denied. Contact a administrator."}'
+            )
 
     return None
 
@@ -193,7 +234,7 @@ def get_cognito_sub():
 
 @app.get("/api/user/me")
 def get_user():
-    auth_error = validate_cloudfront_secret()
+    auth_error = access_validation()
     if auth_error:
         return auth_error
 
@@ -230,7 +271,7 @@ def get_user():
 
 @app.post("/api/user")
 def create_user():
-    auth_error = validate_cloudfront_secret()
+    auth_error = access_validation()
     if auth_error:
         return auth_error
 
@@ -316,7 +357,7 @@ def create_user():
 
 @app.put("/api/user/me")
 def update_user():
-    auth_error = validate_cloudfront_secret()
+    auth_error = access_validation()
     if auth_error:
         return auth_error
 
@@ -404,7 +445,7 @@ def update_user():
 
 @app.get("/api/user/healthcheck")
 def healthcheck():
-    auth_error = validate_cloudfront_secret()
+    auth_error = access_validation()
     if auth_error:
         return auth_error
 
@@ -417,7 +458,7 @@ def healthcheck():
 
 @app.get("/api/user/getparam")
 def getparam():
-    auth_error = validate_cloudfront_secret()
+    auth_error = access_validation()
     if auth_error:
         return auth_error
 
