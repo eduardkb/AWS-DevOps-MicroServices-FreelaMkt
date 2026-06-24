@@ -50,13 +50,31 @@ jobs:
       - name: Build dependencies layer for all Lambda functions
         run: |
           pip install \
+            -r backend_API/shared_layer/requirements.txt \
             --platform manylinux2014_x86_64 \
             --implementation cp \
             --python-version 3.12 \
             --only-binary=:all: \
-            --target backend_API/shared_layer/python \
-            psycopg2-binary boto3 \
-            aws-lambda-powertools
+            -t backend_API/shared_layer/python
+
+      - name: Debug installed packages (layer contents)
+        run: |
+          echo "=== Listing shared_layer/python ==="
+          ls -R backend_API/shared_layer/python
+
+          echo "=== Check for jwt (PyJWT) ==="
+          find backend_API/shared_layer/python -name "*jwt*" || true
+
+          echo "=== Check dist-info ==="
+          find backend_API/shared_layer/python -name "*dist-info*" || true
+
+      - name: Debug final layer folder structure
+        run: |
+          echo "=== Layer directory tree ==="
+          find backend_API/shared_layer -type f | sort
+
+          echo "=== Python folder specifically ==="
+          ls -R backend_API/shared_layer/python || true
 
       - name: Terraform Init
         working-directory: terraform/envs/${{ inputs.environment }}/
