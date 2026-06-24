@@ -1,5 +1,6 @@
 import os
 import json
+import uuid
 import boto3
 import psycopg2
 
@@ -94,6 +95,65 @@ def validate_cloudfront_secret():
 
     return None
 
+
+# ============================================================
+# Response Helpers
+# ============================================================
+
+def error_responses():
+    return {
+        "db_connect": Response(
+            status_code=500,
+            content_type="application/json",
+            body=json.dumps({"success": False, "message": "Unable to connect to database"})
+        ),
+        "db_query": Response(
+            status_code=500,
+            content_type="application/json",
+            body=json.dumps({"success": False, "message": "Database query failed"})
+        ),
+        "internal": Response(
+            status_code=500,
+            content_type="application/json",
+            body=json.dumps({"success": False, "message": "Internal server error"})
+        ),
+    }
+
+
+def handle_db_errors(func):
+    def wrapper(*args, **kwargs):
+        connection = None
+        cursor = None
+        try:
+            connection = get_db_connection()
+            cursor = connection.cursor()
+            result = func(*args, connection=connection, cursor=cursor, **kwargs)
+            connection.commit()
+            return result
+        except psycopg2.OperationalError:
+            logger.exception("Database connection error")
+            if connection:
+                connection.rollback()
+            return error_responses()["db_connect"]
+        except psycopg2.Error:
+            logger.exception("Database query error")
+            if connection:
+                connection.rollback()
+            return error_responses()["db_query"]
+        except Exception:
+            logger.exception("Unexpected error")
+            if connection:
+                connection.rollback()
+            return error_responses()["internal"]
+        finally:
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()
+            logger.info("Request completed")
+    return wrapper
+
+
 # ============================================================
 # Services
 # ============================================================
@@ -103,163 +163,181 @@ def list_service():
     auth_error = validate_cloudfront_secret()
     if auth_error:
         return auth_error
-    
 
-    logger.info("GET /service request received")
+    logger.info("GET /api/service request received")
 
-    connection = None
-    cursor = None
-
-    try:
-
-        logger.info("Opening database connection")
-
-        connection = get_db_connection()
-
-        logger.info("Creating cursor")
-
-        cursor = connection.cursor()
-
-        query = """
-        SELECT *
-        FROM services
-        ORDER BY id
-        """
-
-        logger.info("Executing query")
-        logger.info(query)
-
-        cursor.execute(query)
-
-        logger.info("Fetching rows")
-
+    @handle_db_errors
+    def _query(connection, cursor):
+        cursor.execute("""
+            SELECT id, user_id, title, description, category, price,
+                   portfolio_keys, active, created_at, updated_at
+            FROM services
+            ORDER BY created_at DESC
+        """)
         rows = cursor.fetchall()
-
-        logger.info(f"Rows retrieved: {len(rows)}")
-
         columns = [desc[0] for desc in cursor.description]
-
-        logger.info(f"Columns found: {columns}")
-
-        services = []
-
-        for row in rows:
-            services.append(
-                dict(zip(columns, row))
-            )
-
-        logger.info(
-            f"Successfully returning {len(services)} services"
-        )
-
+        services = [dict(zip(columns, row)) for row in rows]
+        logger.info(f"Successfully returning {len(services)} services")
         return Response(
             status_code=200,
             content_type="application/json",
-            body=json.dumps(
-                {
-                    "success": True,
-                    "count": len(services),
-                    "data": services
-                },
-                default=str
-            )
+            body=json.dumps({"success": True, "count": len(services), "data": services}, default=str)
         )
 
-    except psycopg2.OperationalError as error:
+    return _query()
 
-        logger.exception("Database connection error")
-
-        return Response(
-            status_code=500,
-            content_type="application/json",
-            body=json.dumps(
-                {
-                    "success": False,
-                    "message": "Unable to connect to database"
-                }
-            )
-        )
-
-    except psycopg2.Error as error:
-
-        logger.exception("Database query error")
-
-        return Response(
-            status_code=500,
-            content_type="application/json",
-            body=json.dumps(
-                {
-                    "success": False,
-                    "message": "Database query failed"
-                }
-            )
-        )
-
-    except KeyError as error:
-
-        logger.exception("Missing environment variable or secret field")
-
-        return Response(
-            status_code=500,
-            content_type="application/json",
-            body=json.dumps(
-                {
-                    "success": False,
-                    "message": f"Configuration error: {str(error)}"
-                }
-            )
-        )
-
-    except Exception as error:
-
-        logger.exception("Unexpected error")
-
-        return Response(
-            status_code=500,
-            content_type="application/json",
-            body=json.dumps(
-                {
-                    "success": False,
-                    "message": "Internal server error"
-                }
-            )
-        )
-
-    finally:
-
-        if cursor:
-            logger.info("Closing cursor")
-            cursor.close()
-
-        if connection:
-            logger.info("Closing database connection")
-            connection.close()
-
-        logger.info("Request completed")
 
 @app.post("/api/service")
 def create_service():
     auth_error = validate_cloudfront_secret()
     if auth_error:
         return auth_error
-    
-    return Response(
-        status_code=200,
-        content_type="application/json",
-        body='{"message":"Service created"}'
-    )
+
+    logger.info("POST /api/service request received")
+
+    try:
+        body = app.current_event.json_body
+    except Exception:
+        return Response(
+            status_code=400,
+            content_type="application/json",
+            body=json.dumps({"success": False, "message": "Invalid JSON body"})
+        )
+
+    # Required fields
+    required_fields = ["user_id", "title", "category", "price"]
+    missing = [f for f in required_fields if not body.get(f)]
+    if missing:
+        return Response(
+            status_code=400,
+            content_type="application/json",
+            body=json.dumps({"success": False, "message": f"Missing required fields: {', '.join(missing)}"})
+        )
+
+    # Validate user_id UUID
+    try:
+        user_id = str(uuid.UUID(str(body["user_id"])))
+    except ValueError:
+        return Response(
+            status_code=400,
+            content_type="application/json",
+            body=json.dumps({"success": False, "message": "Invalid user_id format (must be UUID)"})
+        )
+
+    title = str(body["title"]).strip()
+    if not title or len(title) > 255:
+        return Response(
+            status_code=400,
+            content_type="application/json",
+            body=json.dumps({"success": False, "message": "title must be between 1 and 255 characters"})
+        )
+
+    category = str(body["category"]).strip()
+    if not category or len(category) > 100:
+        return Response(
+            status_code=400,
+            content_type="application/json",
+            body=json.dumps({"success": False, "message": "category must be between 1 and 100 characters"})
+        )
+
+    try:
+        price = float(body["price"])
+        if price < 0:
+            raise ValueError()
+    except (ValueError, TypeError):
+        return Response(
+            status_code=400,
+            content_type="application/json",
+            body=json.dumps({"success": False, "message": "price must be a non-negative number"})
+        )
+
+    description = body.get("description")
+    if description is not None:
+        description = str(description).strip() or None
+
+    portfolio_keys = body.get("portfolio_keys")
+    if portfolio_keys is not None and not isinstance(portfolio_keys, (list, dict)):
+        return Response(
+            status_code=400,
+            content_type="application/json",
+            body=json.dumps({"success": False, "message": "portfolio_keys must be a JSON object or array"})
+        )
+
+    active = body.get("active", True)
+    if not isinstance(active, bool):
+        return Response(
+            status_code=400,
+            content_type="application/json",
+            body=json.dumps({"success": False, "message": "active must be a boolean"})
+        )
+
+    @handle_db_errors
+    def _insert(connection, cursor):
+        cursor.execute("""
+            INSERT INTO services (user_id, title, description, category, price, portfolio_keys, active)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            RETURNING id, user_id, title, description, category, price,
+                      portfolio_keys, active, created_at, updated_at
+        """, (
+            user_id, title, description, category, round(price, 2),
+            json.dumps(portfolio_keys) if portfolio_keys is not None else None,
+            active
+        ))
+        row = cursor.fetchone()
+        columns = [desc[0] for desc in cursor.description]
+        service = dict(zip(columns, row))
+        logger.info(f"Service created with id={service['id']}")
+        return Response(
+            status_code=201,
+            content_type="application/json",
+            body=json.dumps({"success": True, "data": service}, default=str)
+        )
+
+    return _insert()
+
 
 @app.get("/api/service/<service_id>")
 def get_service(service_id: str):
     auth_error = validate_cloudfront_secret()
     if auth_error:
         return auth_error
-    
-    return Response(
-        status_code=200,
-        content_type="application/json",
-        body=f'{{"message":"Service {service_id} retrieved"}}'
-    )
+
+    logger.info(f"GET /api/service/{service_id} request received")
+
+    try:
+        service_id = str(uuid.UUID(service_id))
+    except ValueError:
+        return Response(
+            status_code=400,
+            content_type="application/json",
+            body=json.dumps({"success": False, "message": "Invalid service_id format (must be UUID)"})
+        )
+
+    @handle_db_errors
+    def _query(connection, cursor):
+        cursor.execute("""
+            SELECT id, user_id, title, description, category, price,
+                   portfolio_keys, active, created_at, updated_at
+            FROM services
+            WHERE id = %s
+        """, (service_id,))
+        row = cursor.fetchone()
+        if not row:
+            return Response(
+                status_code=404,
+                content_type="application/json",
+                body=json.dumps({"success": False, "message": "Service not found"})
+            )
+        columns = [desc[0] for desc in cursor.description]
+        service = dict(zip(columns, row))
+        logger.info(f"Service retrieved: id={service_id}")
+        return Response(
+            status_code=200,
+            content_type="application/json",
+            body=json.dumps({"success": True, "data": service}, default=str)
+        )
+
+    return _query()
 
 
 @app.put("/api/service/<service_id>")
@@ -267,12 +345,124 @@ def update_service(service_id: str):
     auth_error = validate_cloudfront_secret()
     if auth_error:
         return auth_error
-    
-    return Response(
-        status_code=200,
-        content_type="application/json",
-        body=f'{{"message":"Service {service_id} updated"}}'
-    )
+
+    logger.info(f"PUT /api/service/{service_id} request received")
+
+    try:
+        service_id = str(uuid.UUID(service_id))
+    except ValueError:
+        return Response(
+            status_code=400,
+            content_type="application/json",
+            body=json.dumps({"success": False, "message": "Invalid service_id format (must be UUID)"})
+        )
+
+    try:
+        body = app.current_event.json_body
+    except Exception:
+        return Response(
+            status_code=400,
+            content_type="application/json",
+            body=json.dumps({"success": False, "message": "Invalid JSON body"})
+        )
+
+    allowed_fields = {"title", "description", "category", "price", "portfolio_keys", "active"}
+    updates = {k: v for k, v in body.items() if k in allowed_fields}
+
+    if not updates:
+        return Response(
+            status_code=400,
+            content_type="application/json",
+            body=json.dumps({"success": False, "message": "No valid fields provided for update"})
+        )
+
+    # Validate provided fields
+    if "title" in updates:
+        title = str(updates["title"]).strip()
+        if not title or len(title) > 255:
+            return Response(
+                status_code=400,
+                content_type="application/json",
+                body=json.dumps({"success": False, "message": "title must be between 1 and 255 characters"})
+            )
+        updates["title"] = title
+
+    if "category" in updates:
+        category = str(updates["category"]).strip()
+        if not category or len(category) > 100:
+            return Response(
+                status_code=400,
+                content_type="application/json",
+                body=json.dumps({"success": False, "message": "category must be between 1 and 100 characters"})
+            )
+        updates["category"] = category
+
+    if "price" in updates:
+        try:
+            price = float(updates["price"])
+            if price < 0:
+                raise ValueError()
+            updates["price"] = round(price, 2)
+        except (ValueError, TypeError):
+            return Response(
+                status_code=400,
+                content_type="application/json",
+                body=json.dumps({"success": False, "message": "price must be a non-negative number"})
+            )
+
+    if "description" in updates:
+        desc = updates["description"]
+        updates["description"] = str(desc).strip() if desc is not None else None
+
+    if "portfolio_keys" in updates:
+        pk = updates["portfolio_keys"]
+        if pk is not None and not isinstance(pk, (list, dict)):
+            return Response(
+                status_code=400,
+                content_type="application/json",
+                body=json.dumps({"success": False, "message": "portfolio_keys must be a JSON object or array"})
+            )
+        updates["portfolio_keys"] = json.dumps(pk) if pk is not None else None
+
+    if "active" in updates:
+        if not isinstance(updates["active"], bool):
+            return Response(
+                status_code=400,
+                content_type="application/json",
+                body=json.dumps({"success": False, "message": "active must be a boolean"})
+            )
+
+    @handle_db_errors
+    def _update(connection, cursor):
+        set_clauses = ", ".join(f"{col} = %s" for col in updates.keys())
+        set_clauses += ", updated_at = CURRENT_TIMESTAMP"
+        values = list(updates.values()) + [service_id]
+
+        cursor.execute(f"""
+            UPDATE services
+            SET {set_clauses}
+            WHERE id = %s
+            RETURNING id, user_id, title, description, category, price,
+                      portfolio_keys, active, created_at, updated_at
+        """, values)
+
+        row = cursor.fetchone()
+        if not row:
+            return Response(
+                status_code=404,
+                content_type="application/json",
+                body=json.dumps({"success": False, "message": "Service not found"})
+            )
+        columns = [desc[0] for desc in cursor.description]
+        service = dict(zip(columns, row))
+        logger.info(f"Service updated: id={service_id}")
+        return Response(
+            status_code=200,
+            content_type="application/json",
+            body=json.dumps({"success": True, "data": service}, default=str)
+        )
+
+    return _update()
 
 
 @app.delete("/api/service/<service_id>")
@@ -280,12 +470,37 @@ def delete_service(service_id: str):
     auth_error = validate_cloudfront_secret()
     if auth_error:
         return auth_error
-    
-    return Response(
-        status_code=200,
-        content_type="application/json",
-        body=f'{{"message":"Service {service_id} deleted"}}'
-    )
+
+    logger.info(f"DELETE /api/service/{service_id} request received")
+
+    try:
+        service_id = str(uuid.UUID(service_id))
+    except ValueError:
+        return Response(
+            status_code=400,
+            content_type="application/json",
+            body=json.dumps({"success": False, "message": "Invalid service_id format (must be UUID)"})
+        )
+
+    @handle_db_errors
+    def _delete(connection, cursor):
+        cursor.execute("DELETE FROM services WHERE id = %s RETURNING id", (service_id,))
+        row = cursor.fetchone()
+        if not row:
+            return Response(
+                status_code=404,
+                content_type="application/json",
+                body=json.dumps({"success": False, "message": "Service not found"})
+            )
+        logger.info(f"Service deleted: id={service_id}")
+        return Response(
+            status_code=200,
+            content_type="application/json",
+            body=json.dumps({"success": True, "message": f"Service {service_id} deleted successfully"})
+        )
+
+    return _delete()
+
 
 # ============================================================
 # Lambda Entry Point

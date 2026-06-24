@@ -1,7 +1,7 @@
 Modify Python Flask Web application code attached as app.zip.
 use as few AI resources as possible.
 don't write text explaining the code. while it is being written.
-priority is to generate the code requested code below.
+priority is to generate the code requested below.
 Always zip only the files that needed to be modified to the results.zip file and let me download it.
 
 Modifications:
