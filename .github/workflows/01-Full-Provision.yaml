@@ -51,10 +51,6 @@ jobs:
         run: |
           pip install \
             -r backend_API/shared_layer/requirements.txt \
-            --platform manylinux2014_x86_64 \
-            --implementation cp \
-            --python-version 3.12 \
-            --only-binary=:all: \
             -t backend_API/shared_layer/python
 
       - name: Debug installed packages (layer contents)
