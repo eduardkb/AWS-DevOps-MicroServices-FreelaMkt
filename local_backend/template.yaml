@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 30
+    MemorySize: 256
+
+Resources:
+
+  UsersApi:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend_API/users_api_lambda/
+      Handler: app.lambda_handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: ANY
+      Layers:
+        - !Ref SharedLayer
+
+  ServicesApi:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend_API/services_api_lambda/
+      Handler: app.lambda_handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /services
+            Method: ANY
+      Layers:
+        - !Ref SharedLayer
+
+  BookingsApi:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend_API/bookings_api_lambda/
+      Handler: app.lambda_handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /bookings
+            Method: ANY
+      Layers:
+        - !Ref SharedLayer
+
+  DbMigration:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend_API/db_migration_lambda/
+      Handler: app.lambda_handler
+      Timeout: 60
+      Layers:
+        - !Ref SharedLayer
+
+  SharedLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: shared-layer
+      ContentUri: backend_API/shared_layer/
+      CompatibleRuntimes:
+        - python3.12

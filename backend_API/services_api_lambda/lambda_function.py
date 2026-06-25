@@ -14,29 +14,32 @@ logger = Logger()
 app = APIGatewayHttpResolver()
 
 secrets_client = boto3.client("secretsmanager")
-
+APP_ENV = os.getenv("APP_ENV", "prod")
+IS_DEV = APP_ENV.lower() == "dev"
 
 # ============================================================
 # Secrets Manager Helpers
 # ============================================================
 
 def get_secret():
+    if IS_DEV:
+        logger.info("Development mode - using environment variables")
+        return {
+            "username": os.environ["DB_USER"],
+            "password": os.environ["DB_PASSWORD"]
+        }
+
+    logger.info("Production mode - retrieving credentials from Secrets Manager")
     logger.info("Retrieving database secret")
-
     secret_arn = os.environ["DB_SECRET_ARN"]
-
     logger.info(f"Secret ARN configured: {secret_arn}")
-
     response = secrets_client.get_secret_value(
         SecretId=secret_arn
     )
 
     logger.info("Secret successfully retrieved")
-
     secret = json.loads(response["SecretString"])
-
     logger.info("Secret parsed successfully")
-
     return secret
 
 
@@ -74,29 +77,28 @@ def get_db_connection():
 # ============================================================
 
 def access_validation():    
-    expected_secret = os.environ.get("CLOUDFRONT_SECRET_HEADER")
-    
-    header_value = app.current_event.get_header_value(
+    if not IS_DEV:
+        expected_secret = os.environ.get("CLOUDFRONT_SECRET_HEADER")
+        header_value = app.current_event.get_header_value(
         name="x-cloudfront-secret",
         default_value=None
     )
-
-    # Validate cloudfront secret
-    if not expected_secret or header_value != expected_secret:
-        logger.warning("Invalid CloudFront secret header received")
-
+        # Validate cloudfront secret
+        if not expected_secret or header_value != expected_secret:
+            logger.warning("Invalid CloudFront secret header received")
         return Response(
             status_code=403,
             content_type="application/json",
             body='{"message":"Forbidden. Invalid request source."}'
         )
+
     
+
+    # Validate access tokenclaim
     authorization = app.current_event.get_header_value(
         name="authorization",
         default_value=None
     )
-
-    # Validate access tokenclaim
     print(jwt.__version__)
     if authorization:
         if authorization.lower().startswith("bearer "):
@@ -135,10 +137,7 @@ def access_validation():
                 content_type="application/json",
                 body='{"message":"Forbidden. API access is denied."}'
             )
-
     return None
-
-
 
 # ============================================================
 # Response Helpers

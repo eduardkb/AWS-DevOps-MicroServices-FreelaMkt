@@ -3,6 +3,7 @@ curl -X GET "https://www.edukb.site/api/user/getparam" `
   -H "Authorization: Bearer XXXXX" `
   -H "x-cloudfront-secret: XXXXX"
 ====
+
 - Design service and booking workings and update RDS tables if needed
     - done. below is a full description.
 - Code FrontEnd User section. 

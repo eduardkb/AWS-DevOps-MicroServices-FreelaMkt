@@ -8,19 +8,24 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 secrets = boto3.client("secretsmanager")
+APP_ENV = os.getenv("APP_ENV", "prod")
+IS_DEV = APP_ENV.lower() == "dev"
 
 def get_secret():
 
-    logger.info("Getting secret ARN")
+    if IS_DEV:
+        logger.info("Development mode - using environment variables")
+        return {
+            "username": os.environ["DB_USER"],
+            "password": os.environ["DB_PASSWORD"]
+        }
 
+    logger.info("Production mode - retrieving credentials from Secrets Manager")
     secret_arn = os.environ["DB_SECRET_ARN"]
-
     response = secrets.get_secret_value(
         SecretId=secret_arn
     )
-
     logger.info("Secret retrieved")
-
     return json.loads(response["SecretString"])
 
 
