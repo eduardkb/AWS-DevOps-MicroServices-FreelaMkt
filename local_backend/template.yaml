@@ -102,5 +102,3 @@ Resources:
         - python3.12
     Metadata:
       BuildMethod: python3.12
-      BuildProperties:
-        PipFlags: "--no-cache-dir"

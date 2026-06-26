@@ -1,8 +1,13 @@
+# ---------------------------------------------------------------------------
+# Local values
+# ---------------------------------------------------------------------------
 locals {
   prj_initials      = lower("${var.project_initials}-${var.project_code}")
   cf_api_origin_id  = "ApiGatewayOrigin"
   cf_alb_origin_id  = "ALBOrigin"
+  fqdn = var.application_dns_prefix == "" ? var.application_dns_zone : "${var.application_dns_prefix}.${var.application_dns_zone}"
 }
+
 
 resource "aws_cloudfront_distribution" "main_cf" {
   enabled         = true

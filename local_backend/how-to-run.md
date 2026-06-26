@@ -121,13 +121,16 @@ psql -h 127.0.0.1 -U postgres -d mydb -c "SELECT * FROM users;"
 
 12. Start API Gateway locally
 sam local start-api --docker-network freela-net \
-  --host 0.0.0.0 --port 3000 --debug
+  --host 0.0.0.0 --port 3000
 
 13. Get WSL IP (for frontend access)
 hostname -I | awk '{print $1}'
 
 Example:
 172.26.123.68
+
+Test API:
+curl http://172.26.123.68:3000/api/user/healthcheck
 
 14. Configure Windows Frontend
 
