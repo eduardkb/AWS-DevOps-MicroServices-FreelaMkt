@@ -3,6 +3,8 @@ curl -X GET "https://www.edukb.site/api/user/getparam" `
   -H "Authorization: Bearer XXXXX" `
   -H "x-cloudfront-secret: XXXXX"
 ====
+- move sahred functions on backend_api lambda to shared_layer
+
 
 - Design service and booking workings and update RDS tables if needed
     - done. below is a full description.

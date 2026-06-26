@@ -7,7 +7,6 @@ import logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-secrets = boto3.client("secretsmanager")
 APP_ENV = os.getenv("APP_ENV", "prod")
 IS_DEV = APP_ENV.lower() == "dev"
 
@@ -20,6 +19,7 @@ def get_secret():
             "password": os.environ["DB_PASSWORD"]
         }
 
+    secrets = boto3.client("secretsmanager")
     logger.info("Production mode - retrieving credentials from Secrets Manager")
     secret_arn = os.environ["DB_SECRET_ARN"]
     response = secrets.get_secret_value(
@@ -30,7 +30,11 @@ def get_secret():
 
 
 def handler(event, context):
-
+    print("##############################################")
+    print("APP_ENV =", APP_ENV)
+    print("DB_USER =", os.environ.get("DB_USER"))
+    print("ALL DB VARS =", {k: v for k, v in os.environ.items() if k.startswith("DB_")})
+    print("##############################################")
     logger.info("Lambda started")
 
     secret = get_secret()

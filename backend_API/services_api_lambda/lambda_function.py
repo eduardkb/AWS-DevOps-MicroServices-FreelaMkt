@@ -13,7 +13,6 @@ logger = Logger()
 
 app = APIGatewayHttpResolver()
 
-secrets_client = boto3.client("secretsmanager")
 APP_ENV = os.getenv("APP_ENV", "prod")
 IS_DEV = APP_ENV.lower() == "dev"
 
@@ -29,6 +28,7 @@ def get_secret():
             "password": os.environ["DB_PASSWORD"]
         }
 
+    secrets_client = boto3.client("secretsmanager")
     logger.info("Production mode - retrieving credentials from Secrets Manager")
     logger.info("Retrieving database secret")
     secret_arn = os.environ["DB_SECRET_ARN"]
@@ -50,6 +50,11 @@ def get_secret():
 def get_db_connection():
     logger.info("Creating database connection")
 
+    if IS_DEV:
+        db_timeout = 15
+    else:
+        db_timeout = 60
+
     secret = get_secret()
 
     logger.info(
@@ -59,14 +64,18 @@ def get_db_connection():
         f"db={os.environ['DB_NAME']}"
     )
 
+    logger.info("Starting DB Connection")
     connection = psycopg2.connect(
         host=os.environ["DB_HOST"],
         port=os.environ["DB_PORT"],
         dbname=os.environ["DB_NAME"],
         user=secret["username"],
         password=secret["password"],
-        connect_timeout=30
+        connect_timeout=db_timeout,
+        options="-c statement_timeout=5000"
+        
     )
+    logger.info("Finished DB Connection try.")
 
     logger.info("Database connection established")
 
@@ -80,17 +89,17 @@ def access_validation():
     if not IS_DEV:
         expected_secret = os.environ.get("CLOUDFRONT_SECRET_HEADER")
         header_value = app.current_event.get_header_value(
-        name="x-cloudfront-secret",
-        default_value=None
-    )
+            name="x-cloudfront-secret",
+            default_value=None
+        )
         # Validate cloudfront secret
         if not expected_secret or header_value != expected_secret:
             logger.warning("Invalid CloudFront secret header received")
-        return Response(
-            status_code=403,
-            content_type="application/json",
-            body='{"message":"Forbidden. Invalid request source."}'
-        )
+            return Response(
+                status_code=403,
+                content_type="application/json",
+                body='{"message":"Forbidden. Invalid request source."}'
+            )
 
     
 
@@ -552,4 +561,31 @@ def delete_service(service_id: str):
 @logger.inject_lambda_context
 def handler(event, context):
     logger.info("Services API request received")
-    return app.resolve(event, context)
+
+    try:
+        response = app.resolve(event, context)
+
+        # Ensure response is valid
+        if response is None:
+            return _response(500, {"error": "Empty response from app.resolve"})
+
+        # If already correct format, return as-is
+        if isinstance(response, dict) and "statusCode" in response:
+            return response
+
+        # Otherwise force JSON-safe wrapping
+        return _response(200, response)
+
+    except Exception as e:
+        logger.exception("Unhandled error in ServicesApi")
+        return _response(500, {"error": str(e)})
+
+
+def _response(status_code, body):
+    return {
+        "statusCode": status_code,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "body": json.dumps(body, default=str)
+    }

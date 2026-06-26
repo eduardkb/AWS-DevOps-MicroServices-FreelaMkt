@@ -14,8 +14,6 @@ logger = Logger()
 
 app = APIGatewayHttpResolver()
 
-secrets_client = boto3.client("secretsmanager")
-
 EMAIL_RE = re.compile(r'^[^\s@]+@[^\s@]+\.[^\s@]+$')
 USERNAME_RE = re.compile(r'^[a-zA-Z0-9_.-]{3,100}$')
 APP_ENV = os.getenv("APP_ENV", "prod")
@@ -33,6 +31,7 @@ def get_secret():
             "password": os.environ["DB_PASSWORD"]
         }
 
+    secrets_client = boto3.client("secretsmanager")
     logger.info("Production mode - retrieving credentials from Secrets Manager")
     logger.info("Retrieving database secret")
     secret_arn = os.environ["DB_SECRET_ARN"]
@@ -54,6 +53,10 @@ def get_secret():
 def get_db_connection():
     logger.info("Creating database connection")
 
+    if IS_DEV:
+        db_timeout = 15
+    else:
+        db_timeout = 60
     secret = get_secret()
 
     logger.info(
@@ -69,7 +72,8 @@ def get_db_connection():
         dbname=os.environ["DB_NAME"],
         user=secret["username"],
         password=secret["password"],
-        connect_timeout=30
+        connect_timeout=db_timeout,
+        options="-c statement_timeout=5000"
     )
 
     logger.info("Database connection established")
@@ -96,8 +100,6 @@ def access_validation():
             content_type="application/json",
             body='{"message":"Forbidden. Invalid request source."}'
         )
-
-    
 
     # Validate access tokenclaim
     authorization = app.current_event.get_header_value(
@@ -481,4 +483,31 @@ def getparam():
 @logger.inject_lambda_context
 def handler(event, context):
     logger.info("Users API request received")
-    return app.resolve(event, context)
+
+    try:
+        response = app.resolve(event, context)
+
+        # Ensure response is valid
+        if response is None:
+            return _response(500, {"error": "Empty response from app.resolve"})
+
+        # If already correct format, return as-is
+        if isinstance(response, dict) and "statusCode" in response:
+            return response
+
+        # Otherwise force JSON-safe wrapping
+        return _response(200, response)
+
+    except Exception as e:
+        logger.exception("Unhandled error in ServicesApi")
+        return _response(500, {"error": str(e)})
+
+
+def _response(status_code, body):
+    return {
+        "statusCode": status_code,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "body": json.dumps(body, default=str)
+    }

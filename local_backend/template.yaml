@@ -4,66 +4,103 @@ Transform: AWS::Serverless-2016-10-31
 Globals:
   Function:
     Runtime: python3.12
-    Timeout: 30
+    Timeout: 60
     MemorySize: 256
+    Environment:
+      Variables: &default_env
+        APP_ENV: dev
+        DB_HOST: freela-postgres
+        DB_PORT: "5432"
+        DB_NAME: mydb
+        DB_USER: postgres
+        DB_PASSWORD: postgres
 
 Resources:
 
   UsersApi:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: backend_API/users_api_lambda/
-      Handler: app.lambda_handler
+      CodeUri: backend_api/users_api_lambda/
+      Handler: lambda_function.handler
       Events:
-        Api:
-          Type: Api
+        ApiProxy:
+          Type: HttpApi
           Properties:
-            Path: /users
+            Path: /api/user
+            Method: ANY
+        ApiProxyGreedy:
+          Type: HttpApi
+          Properties:
+            Path: /api/user/{proxy+}
             Method: ANY
       Layers:
         - !Ref SharedLayer
+    Metadata:
+      BuildMethod: python3.12
 
   ServicesApi:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: backend_API/services_api_lambda/
-      Handler: app.lambda_handler
+      CodeUri: backend_api/services_api_lambda/
+      Handler: lambda_function.handler
       Events:
-        Api:
-          Type: Api
+        ApiProxy:
+          Type: HttpApi
           Properties:
-            Path: /services
+            Path: /api/service
+            Method: ANY
+        ApiProxyGreedy:
+          Type: HttpApi
+          Properties:
+            Path: /api/service/{proxy+}
             Method: ANY
       Layers:
         - !Ref SharedLayer
+    Metadata:
+      BuildMethod: python3.12
 
   BookingsApi:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: backend_API/bookings_api_lambda/
-      Handler: app.lambda_handler
+      CodeUri: backend_api/bookings_api_lambda/
+      Handler: lambda_function.handler
       Events:
-        Api:
-          Type: Api
+        ApiProxy:
+          Type: HttpApi
           Properties:
-            Path: /bookings
+            Path: /api/booking
+            Method: ANY
+        ApiProxyGreedy:
+          Type: HttpApi
+          Properties:
+            Path: /api/booking/{proxy+}
             Method: ANY
       Layers:
         - !Ref SharedLayer
+    Metadata:
+      BuildMethod: python3.12
 
   DbMigration:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: backend_API/db_migration_lambda/
-      Handler: app.lambda_handler
+      CodeUri: backend_api/db_migration_lambda/
+      Handler: lambda_function.handler
       Timeout: 60
+      Environment:
+        Variables: *default_env
       Layers:
         - !Ref SharedLayer
+    Metadata:
+      BuildMethod: python3.12
 
   SharedLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
       LayerName: shared-layer
-      ContentUri: backend_API/shared_layer/
+      ContentUri: backend_api/shared_layer/
       CompatibleRuntimes:
         - python3.12
+    Metadata:
+      BuildMethod: python3.12
+      BuildProperties:
+        PipFlags: "--no-cache-dir"
