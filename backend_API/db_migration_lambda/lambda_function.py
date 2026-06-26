@@ -1,46 +1,24 @@
 import os
-import json
-import boto3
-import psycopg2
 import logging
+import psycopg2
+
+from shared_db import get_secret
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 APP_ENV = os.getenv("APP_ENV", "prod")
-IS_DEV = APP_ENV.lower() == "dev"
-
-def get_secret():
-
-    if IS_DEV:
-        logger.info("Development mode - using environment variables")
-        return {
-            "username": os.environ["DB_USER"],
-            "password": os.environ["DB_PASSWORD"]
-        }
-
-    secrets = boto3.client("secretsmanager")
-    logger.info("Production mode - retrieving credentials from Secrets Manager")
-    secret_arn = os.environ["DB_SECRET_ARN"]
-    response = secrets.get_secret_value(
-        SecretId=secret_arn
-    )
-    logger.info("Secret retrieved")
-    return json.loads(response["SecretString"])
 
 
 def handler(event, context):
-    print("##############################################")
-    print("APP_ENV =", APP_ENV)
-    print("DB_USER =", os.environ.get("DB_USER"))
-    print("ALL DB VARS =", {k: v for k, v in os.environ.items() if k.startswith("DB_")})
-    print("##############################################")
     logger.info("Lambda started")
+    logger.info(f"APP_ENV = {APP_ENV}")
 
     secret = get_secret()
 
     logger.info(
-        f"Connecting to database host={os.environ['DB_HOST']} port={os.environ['DB_PORT']} db={os.environ['DB_NAME']}"
+        f"Connecting to database host={os.environ['DB_HOST']} "
+        f"port={os.environ['DB_PORT']} db={os.environ['DB_NAME']}"
     )
 
     connection = psycopg2.connect(
@@ -55,7 +33,6 @@ def handler(event, context):
     logger.info("Database connected")
 
     connection.autocommit = True
-
     cursor = connection.cursor()
 
     logger.info("Opening migration.sql")
@@ -64,16 +41,11 @@ def handler(event, context):
         sql = file.read()
 
     logger.info("Executing migration SQL")
-
     cursor.execute(sql)
-
     logger.info("Migration completed")
 
     cursor.close()
     connection.close()
-
     logger.info("Connection closed")
 
-    return {
-        "success": True
-    }
+    return {"success": True}

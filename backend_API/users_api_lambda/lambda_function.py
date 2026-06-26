@@ -1,235 +1,22 @@
 import os
 import re
 import json
-import uuid
-import boto3
-import psycopg2
-import jwt
 
-from aws_lambda_powertools import Logger # type: ignore
-from aws_lambda_powertools.event_handler import APIGatewayHttpResolver # type: ignore
-from aws_lambda_powertools.event_handler import Response # type: ignore
+from aws_lambda_powertools import Logger  # type: ignore
+from aws_lambda_powertools.event_handler import APIGatewayHttpResolver  # type: ignore
+from aws_lambda_powertools.event_handler import Response  # type: ignore
+
+from shared_db import db_execute
+from shared_helpers import (
+    access_validation, bad_request, not_found, conflict,
+    get_cognito_sub, lambda_response
+)
 
 logger = Logger()
-
 app = APIGatewayHttpResolver()
 
 EMAIL_RE = re.compile(r'^[^\s@]+@[^\s@]+\.[^\s@]+$')
 USERNAME_RE = re.compile(r'^[a-zA-Z0-9_.-]{3,100}$')
-APP_ENV = os.getenv("APP_ENV", "prod")
-IS_DEV = APP_ENV.lower() == "dev"
-
-# ============================================================
-# Secrets Manager Helpers
-# ============================================================
-
-def get_secret():
-    if IS_DEV:
-        logger.info("Development mode - using environment variables")
-        return {
-            "username": os.environ["DB_USER"],
-            "password": os.environ["DB_PASSWORD"]
-        }
-
-    secrets_client = boto3.client("secretsmanager")
-    logger.info("Production mode - retrieving credentials from Secrets Manager")
-    logger.info("Retrieving database secret")
-    secret_arn = os.environ["DB_SECRET_ARN"]
-    logger.info(f"Secret ARN configured: {secret_arn}")
-    response = secrets_client.get_secret_value(
-        SecretId=secret_arn
-    )
-
-    logger.info("Secret successfully retrieved")
-    secret = json.loads(response["SecretString"])
-    logger.info("Secret parsed successfully")
-    return secret
-
-
-# ============================================================
-# Database Helpers
-# ============================================================
-
-def get_db_connection():
-    logger.info("Creating database connection")
-
-    if IS_DEV:
-        db_timeout = 15
-    else:
-        db_timeout = 60
-    secret = get_secret()
-
-    logger.info(
-        f"Connecting to database "
-        f"host={os.environ['DB_HOST']} "
-        f"port={os.environ['DB_PORT']} "
-        f"db={os.environ['DB_NAME']}"
-    )
-
-    connection = psycopg2.connect(
-        host=os.environ["DB_HOST"],
-        port=os.environ["DB_PORT"],
-        dbname=os.environ["DB_NAME"],
-        user=secret["username"],
-        password=secret["password"],
-        connect_timeout=db_timeout,
-        options="-c statement_timeout=5000"
-    )
-
-    logger.info("Database connection established")
-
-    return connection
-
-
-# ============================================================
-# Access Validation Helper
-# ============================================================
-
-def access_validation():    
-    if not IS_DEV:
-        expected_secret = os.environ.get("CLOUDFRONT_SECRET_HEADER")
-        header_value = app.current_event.get_header_value(
-        name="x-cloudfront-secret",
-        default_value=None
-    )
-        # Validate cloudfront secret
-        if not expected_secret or header_value != expected_secret:
-            logger.warning("Invalid CloudFront secret header received")
-        return Response(
-            status_code=403,
-            content_type="application/json",
-            body='{"message":"Forbidden. Invalid request source."}'
-        )
-
-    # Validate access tokenclaim
-    authorization = app.current_event.get_header_value(
-        name="authorization",
-        default_value=None
-    )
-    print(jwt.__version__)
-    if authorization:
-        if authorization.lower().startswith("bearer "):
-            token = authorization[7:].strip()
-        else:
-            token = authorization.strip()
-
-        try:
-            # Decode without verifying the signature.            
-            claims = jwt.decode(
-                token,
-                options={"verify_signature": False}
-            )
-
-            groups = claims.get("cognito:groups", [])
-
-            if (
-                not isinstance(groups, list)
-                or not any(group in ("admin", "user") for group in groups)
-            ):
-                logger.warning(
-                    "Access denied. Missing or invalid Cognito group."
-                )
-
-                return Response(
-                    status_code=403,
-                    content_type="application/json",
-                    body='{"message":"Forbidden. API access is denied. Contact a administrator."}'
-                )
-
-        except Exception as e:
-            logger.exception("Failed to decode token")
-
-            return Response(
-                status_code=403,
-                content_type="application/json",
-                body='{"message":"Forbidden. API access is denied."}'
-            )
-    return None
-
-# ============================================================
-# Helpers
-# ============================================================
-
-def bad_request(message):
-    return Response(
-        status_code=400,
-        content_type="application/json",
-        body=json.dumps({"success": False, "message": message})
-    )
-
-
-def not_found(message="User not found"):
-    return Response(
-        status_code=404,
-        content_type="application/json",
-        body=json.dumps({"success": False, "message": message})
-    )
-
-
-def conflict(message):
-    return Response(
-        status_code=409,
-        content_type="application/json",
-        body=json.dumps({"success": False, "message": message})
-    )
-
-
-def db_execute(fn):
-    connection = None
-    cursor = None
-    try:
-        connection = get_db_connection()
-        cursor = connection.cursor()
-        result = fn(cursor)
-        connection.commit()
-        return result
-    except psycopg2.OperationalError:
-        logger.exception("Database connection error")
-        if connection:
-            connection.rollback()
-        return Response(
-            status_code=500,
-            content_type="application/json",
-            body=json.dumps({"success": False, "message": "Unable to connect to database"})
-        )
-    except psycopg2.Error:
-        logger.exception("Database query error")
-        if connection:
-            connection.rollback()
-        return Response(
-            status_code=500,
-            content_type="application/json",
-            body=json.dumps({"success": False, "message": "Database query failed"})
-        )
-    except Exception:
-        logger.exception("Unexpected error")
-        if connection:
-            connection.rollback()
-        return Response(
-            status_code=500,
-            content_type="application/json",
-            body=json.dumps({"success": False, "message": "Internal server error"})
-        )
-    finally:
-        if cursor:
-            cursor.close()
-        if connection:
-            connection.close()
-        logger.info("Request completed")
-
-
-def get_cognito_sub():
-    """Extract cognito_sub from the Cognito authorizer context."""
-    try:
-        return (
-            app.current_event.request_context
-            .get("authorizer", {})
-            .get("jwt", {})
-            .get("claims", {})
-            .get("sub")
-        )
-    except Exception:
-        return None
 
 
 # ============================================================
@@ -238,13 +25,13 @@ def get_cognito_sub():
 
 @app.get("/api/user/me")
 def get_user():
-    auth_error = access_validation()
+    auth_error = access_validation(app, logger)
     if auth_error:
         return auth_error
 
     logger.info("GET /api/user/me request received")
 
-    cognito_sub = get_cognito_sub()
+    cognito_sub = get_cognito_sub(app)
     if not cognito_sub:
         return bad_request("Missing or invalid authorization context")
 
@@ -260,7 +47,7 @@ def get_user():
         )
         row = cursor.fetchone()
         if not row:
-            return not_found()
+            return not_found("User not found")
         columns = [desc[0] for desc in cursor.description]
         user = dict(zip(columns, row))
         logger.info(f"User retrieved: cognito_sub={cognito_sub}")
@@ -270,12 +57,12 @@ def get_user():
             body=json.dumps({"success": True, "data": user}, default=str)
         )
 
-    return db_execute(_query)
+    return db_execute(_query, logger)
 
 
 @app.post("/api/user")
 def create_user():
-    auth_error = access_validation()
+    auth_error = access_validation(app, logger)
     if auth_error:
         return auth_error
 
@@ -286,7 +73,6 @@ def create_user():
     except Exception:
         return bad_request("Invalid JSON body")
 
-    # Required fields
     required = ["cognito_sub", "email", "preferred_username", "full_name"]
     missing = [f for f in required if not body.get(f)]
     if missing:
@@ -322,7 +108,6 @@ def create_user():
         avatar_key = avatar_key or None
 
     def _insert(cursor):
-        # Check uniqueness before insert for a clearer error message
         cursor.execute(
             "SELECT cognito_sub, email, preferred_username FROM users WHERE cognito_sub = %s OR email = %s OR preferred_username = %s",
             (cognito_sub, email, preferred_username)
@@ -356,18 +141,18 @@ def create_user():
             body=json.dumps({"success": True, "data": user}, default=str)
         )
 
-    return db_execute(_insert)
+    return db_execute(_insert, logger)
 
 
 @app.put("/api/user/me")
 def update_user():
-    auth_error = access_validation()
+    auth_error = access_validation(app, logger)
     if auth_error:
         return auth_error
 
     logger.info("PUT /api/user/me request received")
 
-    cognito_sub = get_cognito_sub()
+    cognito_sub = get_cognito_sub(app)
     if not cognito_sub:
         return bad_request("Missing or invalid authorization context")
 
@@ -382,7 +167,6 @@ def update_user():
     if not updates:
         return bad_request(f"No valid fields provided. Updatable fields: {', '.join(sorted(allowed_fields))}")
 
-    # Validate provided fields
     if "preferred_username" in updates:
         preferred_username = str(updates["preferred_username"]).strip()
         if not USERNAME_RE.match(preferred_username):
@@ -434,7 +218,7 @@ def update_user():
         )
         row = cursor.fetchone()
         if not row:
-            return not_found()
+            return not_found("User not found")
         columns = [desc[0] for desc in cursor.description]
         user = dict(zip(columns, row))
         logger.info(f"User updated: cognito_sub={cognito_sub}")
@@ -444,12 +228,12 @@ def update_user():
             body=json.dumps({"success": True, "data": user}, default=str)
         )
 
-    return db_execute(_update)
+    return db_execute(_update, logger)
 
 
 @app.get("/api/user/healthcheck")
 def healthcheck():
-    auth_error = access_validation()
+    auth_error = access_validation(app, logger)
     if auth_error:
         return auth_error
 
@@ -462,7 +246,7 @@ def healthcheck():
 
 @app.get("/api/user/getparam")
 def getparam():
-    auth_error = access_validation()
+    auth_error = access_validation(app, logger)
     if auth_error:
         return auth_error
 
@@ -487,27 +271,14 @@ def handler(event, context):
     try:
         response = app.resolve(event, context)
 
-        # Ensure response is valid
         if response is None:
-            return _response(500, {"error": "Empty response from app.resolve"})
+            return lambda_response(500, {"error": "Empty response from app.resolve"})
 
-        # If already correct format, return as-is
         if isinstance(response, dict) and "statusCode" in response:
             return response
 
-        # Otherwise force JSON-safe wrapping
-        return _response(200, response)
+        return lambda_response(200, response)
 
     except Exception as e:
-        logger.exception("Unhandled error in ServicesApi")
-        return _response(500, {"error": str(e)})
-
-
-def _response(status_code, body):
-    return {
-        "statusCode": status_code,
-        "headers": {
-            "Content-Type": "application/json"
-        },
-        "body": json.dumps(body, default=str)
-    }
+        logger.exception("Unhandled error in UsersApi")
+        return lambda_response(500, {"error": str(e)})
