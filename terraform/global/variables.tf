@@ -22,13 +22,13 @@ variable "db_username" {
 variable "application_dns_zone" {
   description = "DNS zone name for the application"
   type        = string
-  default     = "edukb.site"
+  default     = "eduweb.site"
 }
 
 variable "application_dns_prefix" {
   description = "DNS prefix for the application"
   type        = string
-  default     = "www" 
+  default     = "" 
   # if empty uses apex domain 
   # otherwise subdomain (e.g. 'app' for app.edukb.site)
   # ATTENTION: (*.domanin.com certificate does not cover for domain.com address), 
@@ -49,11 +49,11 @@ variable "cognito_domain" { # ATTENTION: NO HTTPS
 }
 
 variable "cognito_redirect_uri" {
-  default = "https://www.edukb.site/auth/callback"
+  default = "https://eduweb.site/auth/callback"
 }
 
 variable "cognito_logout_uri" {
-  default = "https://www.edukb.site"
+  default = "https://eduweb.site"
 }
 
 variable "cognito_user_pool_id" {
