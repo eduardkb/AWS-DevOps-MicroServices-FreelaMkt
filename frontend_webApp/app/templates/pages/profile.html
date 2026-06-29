@@ -7,27 +7,40 @@
     <h1 class="form-title">My Profile</h1>
     <p class="form-subtitle">Your account information</p>
 
-    <div class="form-group">
-      <label class="form-label" for="fullname">Full Name</label>
-      <input class="form-input" type="text" id="fullname" name="fullname" value="" disabled />
+    <div id="profile-loading" style="color: var(--color-muted, #6b7280); font-size: 0.9rem; margin-bottom: 1rem;">Loading profile…</div>
+    <div id="profile-error" style="display:none; color: #ef4444; font-size: 0.875rem; margin-bottom: 1rem;"></div>
+
+    <div id="profile-fields" style="display:none;">
+      <div class="form-group">
+        <label class="form-label" for="fullname">Full Name</label>
+        <input class="form-input" type="text" id="fullname" name="fullname" value="" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <input class="form-input" type="email" id="email" name="email" value="" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="preferred_username">Preferred Username</label>
+        <input class="form-input" type="text" id="preferred_username" name="preferred_username" value="" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input class="form-input" type="password" id="password" name="password" placeholder="Leave blank to keep current password" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="confirm_password">Confirm Password</label>
+        <input class="form-input" type="password" id="confirm_password" name="confirm_password" placeholder="Repeat new password" />
+      </div>
+
+      <button class="btn-submit" type="button" id="btn-save">Save Changes</button>
     </div>
 
-    <div class="form-group">
-      <label class="form-label" for="email">Email</label>
-      <input class="form-input" type="email" id="email" name="email" value="" disabled />
-    </div>
-
-    <div class="form-group">
-      <label class="form-label" for="sub">User ID</label>
-      <input class="form-input" type="text" id="sub" name="sub" value="" disabled />
-    </div>
-
-    <button class="btn-submit" type="button" disabled>Save Changes</button>
-
-    <p class="form-placeholder-notice">⚠ Profile editing is not yet available. This is a placeholder.</p>
-
-    <!-- Show Details Button -->
-    <div style="margin-top: 2rem; border-top: 1px solid var(--border, #e5e7eb); padding-top: 1.5rem;">
+    <!-- Show Details Button (admin only) -->
+    <div id="details-toggle-wrapper" style="display:none; margin-top: 2rem; border-top: 1px solid var(--border, #e5e7eb); padding-top: 1.5rem;">
       <button id="btn-show-details" class="btn-submit" type="button" style="background: var(--color-secondary, #6b7280);">
         Show Details
       </button>
@@ -65,20 +78,48 @@
 
 {% block extra_js %}
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("DOMContentLoaded", async function () {
     const user = Auth.getUser();
     if (!user) {
       window.location.replace("/auth/login");
       return;
     }
-    document.getElementById("fullname").value = user.name || "";
-    document.getElementById("email").value   = user.email || "";
-    document.getElementById("sub").value     = user.sub || "";
 
+    // Fetch profile from API
+    try {
+      const accessToken = await Auth.getAccessToken();
+      const resp = await fetch("/api/user/me", {
+        headers: {
+          "Authorization": "Bearer " + accessToken,
+          "Content-Type": "application/json"
+        }
+      });
+
+      const result = await resp.json();
+
+      if (!result.success || !result.data) {
+        throw new Error(result.error || "Unexpected API response");
+      }
+
+      const d = result.data;
+      document.getElementById("fullname").value           = d.full_name || "";
+      document.getElementById("email").value              = d.email || "";
+      document.getElementById("preferred_username").value = d.preferred_username || "";
+
+      document.getElementById("profile-loading").style.display = "none";
+      document.getElementById("profile-fields").style.display  = "block";
+
+    } catch (err) {
+      document.getElementById("profile-loading").style.display = "none";
+      const errEl = document.getElementById("profile-error");
+      errEl.textContent = "Could not load profile: " + err.message;
+      errEl.style.display = "block";
+    }
+
+    // Show details toggle (admin only)
     const isAdmin = Array.isArray(user.groups) && user.groups.includes("admin");
-    if (!isAdmin) {
-      const btnWrapper = document.getElementById("btn-show-details").closest("div");
-      if (btnWrapper) btnWrapper.style.display = "none";
+    if (isAdmin) {
+      document.getElementById("details-toggle-wrapper").style.display = "block";
     }
 
     let detailsLoaded = false;
@@ -94,24 +135,14 @@
         if (!detailsLoaded) {
           detailsLoaded = true;
 
-          // Populate tokens
           const SS = sessionStorage;
           document.getElementById("id-token-output").value      = SS.getItem("auth_id_token") || "(not available)";
           document.getElementById("access-token-output").value  = SS.getItem("auth_access_token") || "(not available)";
           document.getElementById("refresh-token-output").value = SS.getItem("auth_refresh_token") || "(not available)";
 
-          // Call API_URL/user/getparam with Access Token
           try {
             const accessToken = await Auth.getAccessToken();
-            const apiConfigResp = await fetch("/auth/config.json");
-            const apiConfig = await apiConfigResp.json();
-            const apiUrl = apiConfig.api_url || window.__API_URL__;
-
-            if (!apiUrl) {
-              throw new Error("API_URL not configured");
-            }
-
-            const resp = await fetch(apiUrl + "/user/getparam", {
+            const resp = await fetch("/api/user/getparam", {
               headers: {
                 "Authorization": "Bearer " + accessToken,
                 "Content-Type": "application/json"

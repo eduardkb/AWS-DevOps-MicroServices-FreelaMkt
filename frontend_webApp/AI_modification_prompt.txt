@@ -3,7 +3,15 @@ use as few AI resources as possible.
 don't write text explaining the code. while it is being written.
 priority is to generate the code requested below.
 Always zip only the files that needed to be modified to the results.zip file and let me download it.
+Always change the file "appVersion" bumping the bug correction verion number by one. (example: 1.0.6 to 1.0.7)
 
 Modifications:
-    - the ID token contains claim: "cognito:groups": [    "user"  ],
-    - in the "my profile" screen, the "show details" button should not be shown unless the "admin" permission is present inside the groups claim.
+    - make a centralized api library where all API's are called using the content of the .env file (variable API URL). the initial page where the api/service is called, it is always called as "http://127.0.0.1/api". 
+    - when logged in, on the my profile page, remove message "⚠ Profile editing is not yet available. This is a placeholder." and do:
+        1. get the user information from api (path: user/me). send the access token with the reqeust.
+        2. the api will send data as: {"success": true, "data": {"id": "22222222-2222-2222-2222-222222222222", "cognito_sub": "240814a8-7031-700a-cb05-afb45471d672", "email": "jsnow@edu.com", "preferred_username": "jsnow", "full_name": "John Snow", "bio": "Full Stack Dev", "avatar_key": "avatars/bob.jpg", "created_at": "2026-06-26 15:12:37.920089", "updated_at": "2026-06-29 14:41:17.097127"}}
+        3. show fields filled out with data from API aboove leaving password empty: Full Name, email, preferred username and Password and confirm password.
+
+
+
+
