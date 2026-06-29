@@ -85,7 +85,7 @@ cp -r /mnt/c/Users/Work/Documents/dev/AWS-DevOps-MicroServices-FreelaMkt/backend
 
 Optional check tree:
 sudo apt install tree -y
-tree
+
 
 8. Check environment variables 
 
@@ -104,10 +104,7 @@ Environment:
 
 sam build --use-container
 
-Ignore requirements.txt message (explanation below)
-check if requirements are installed: `ls .aws-sam/build/SharedLayer/python`
-
-ATTENTION: If added --debug on above comand, message "requirements.txt file not found. Continuing the build without dependencies." is expected. this refers to requirements.txt not existing on each function. but it detects and installs dependencies on folder shared_layer as expected
+Ignore requirements.txt message. Check if requirements are installed: `ls .aws-sam/build/SharedLayer/python`. This happens because it searchs the file inside every foler. but it only exists inside shared folder which is used by all modules.
 
 11. Run Database Migration
 
