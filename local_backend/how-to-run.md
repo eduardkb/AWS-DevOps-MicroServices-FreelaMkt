@@ -103,6 +103,8 @@ Environment:
 10. Build SAM Application
 
 sam build --use-container
+ls .aws-sam/build/SharedLayer/python
+
 
 Ignore requirements.txt message. Check if requirements are installed: `ls .aws-sam/build/SharedLayer/python`. This happens because it searchs the file inside every foler. but it only exists inside shared folder which is used by all modules.
 
@@ -128,6 +130,8 @@ Example:
 
 Test API:
 curl http://172.26.123.68:3000/api/user/healthcheck
+or
+curl http://172.26.123.68:3000/api/service
 
 14. Configure Windows Frontend
 

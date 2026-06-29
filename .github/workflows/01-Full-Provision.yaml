@@ -51,7 +51,10 @@ jobs:
         run: |
           pip install \
             -r backend_API/shared_layer/requirements.txt \
-            -t backend_API/shared_layer/python
+            -t backend_API/shared_layer/python/lib/python3.12/site-packages/ \
+            --platform manylinux2014_x86_64 \
+            --only-binary=:all: \
+            --quiet
       
       - name: Terraform Init
         working-directory: terraform/envs/${{ inputs.environment }}/
