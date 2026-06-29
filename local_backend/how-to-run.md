@@ -103,10 +103,10 @@ Environment:
 10. Build SAM Application
 
 sam build --use-container
-ls .aws-sam/build/SharedLayer/python
+ls .aws-sam/build/SharedLayer/python/lib/python3.12/site-packages/
 
 
-Ignore requirements.txt message. Check if requirements are installed: `ls .aws-sam/build/SharedLayer/python`. This happens because it searchs the file inside every foler. but it only exists inside shared folder which is used by all modules.
+Ignore requirements.txt message. Check if requirements are installed: `ls .aws-sam/build/SharedLayer/python/lib/python3.12/site-packages/`. This happens because it searchs the file inside every foler. but it only exists inside shared folder which is used by all modules.
 
 11. Run Database Migration
 
@@ -132,6 +132,11 @@ Test API:
 curl http://172.26.123.68:3000/api/user/healthcheck
 or
 curl http://172.26.123.68:3000/api/service
+or
+$ACCESS_TOKEN = "ACCESS TOKEN"
+curl -X GET http://172.26.123.68:3000/api/user/me `
+  -H "Authorization: Bearer $ACCESS_TOKEN"
+
 
 14. Configure Windows Frontend
 
@@ -157,8 +162,66 @@ docker start freela-postgres
 cd ~/dev/freelamkt/local_backend
 sam local start-api --docker-network freela-net \
   --host 0.0.0.0 --port 3000 --debug
+
+# During development rebuild and restart
+sam build --cached && \
+sam local start-api --debug \
+--docker-network freela-net \
+--host 0.0.0.0 --port 3000 \
+--warm-containers eager
+
+
+17. Modify users in PostgreSQL
+
+- Default users inserted from SQL script do not work with the web page since the cognito_id is wrong.
+- users can be changed as below to correct them and add cognito's ID.
+- trigger must be disabled (first line) and re-enabled (last) sicne cognito ID is immutable.
+
+--------------------------------------------
+#### DISABLE USER UPDATE TRIGGER RESTRICTIONS
+psql -h 127.0.0.1 -U postgres -d mydb -c \
+"ALTER TABLE users DISABLE TRIGGER trg_prevent_identity_changes;"
+
+#### CHANGE USERS
+psql -h 127.0.0.1 -U postgres -d mydb <<'SQL'
+BEGIN;
+
+UPDATE users
+SET 
+	cognito_sub = '240814a8-7031-700a-cb05-afb45471d672',
+	email = 'jsnow@edu.com',
+    preferred_username = 'jsnow',
+    full_name = 'John Snow'
+WHERE id = '22222222-2222-2222-2222-222222222222';
+
+UPDATE users
+SET
+    cognito_sub = '14f83438-d061-70a8-a499-b59f475ee1fd',
+    email = 'sstark@edu.com',
+    preferred_username = 'sstark',
+    full_name = 'Sansa Stark'
+WHERE id = '11111111-1111-1111-1111-111111111111';
+
+COMMIT;
+SQL
+
+#### SELECT CHANGED USERS
+psql -h 127.0.0.1 -U postgres -d mydb <<'SQL'
+SELECT id, cognito_sub, email, preferred_username, full_name
+FROM users
+WHERE id IN (
+    '11111111-1111-1111-1111-111111111111',
+    '22222222-2222-2222-2222-222222222222'
+);
+SQL
+
+#### ENABLE USER UPDATE TRIGGER RESTRICTIONS
+psql -h 127.0.0.1 -U postgres -d mydb -c \
+"ALTER TABLE users ENABLE TRIGGER trg_prevent_identity_changes;"
+-----------------------------------------------------------
+
   
-17. Troubleshooting
+18. Troubleshooting
 Problem	Fix
 Connection refused to DB	Ensure container is running: docker ps
 Auth failed	Check POSTGRES_PASSWORD in container

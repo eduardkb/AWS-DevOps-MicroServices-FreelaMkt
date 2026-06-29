@@ -30,10 +30,10 @@ def get_user():
         return auth_error
 
     logger.info("GET /api/user/me request received")
-
+    
     cognito_sub = get_cognito_sub(app)
     if not cognito_sub:
-        return bad_request("Missing or invalid authorization context")
+        return bad_request(f"Missing or invalid user SubID: {cognito_sub}")
 
     def _query(cursor):
         cursor.execute(
