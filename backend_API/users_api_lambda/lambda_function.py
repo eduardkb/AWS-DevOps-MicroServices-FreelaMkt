@@ -6,8 +6,8 @@ from aws_lambda_powertools import Logger  # type: ignore
 from aws_lambda_powertools.event_handler import APIGatewayHttpResolver  # type: ignore
 from aws_lambda_powertools.event_handler import Response  # type: ignore
 
-from shared_db import db_execute
-from shared_helpers import (
+from shared_db import db_execute # type: ignore
+from shared_helpers import ( # type: ignore
     access_validation, bad_request, not_found, conflict,
     get_cognito_sub, lambda_response
 )

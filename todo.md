@@ -3,8 +3,63 @@ curl -X GET "https://www.edukb.site/api/user/getparam" `
   -H "Authorization: Bearer XXXXX" `
   -H "x-cloudfront-secret: XXXXX"
 ====
-- move sahred functions on backend_api lambda to shared_layer
+- make site have a global messaging system. all messages displayed below the main page bar.
 
+- Create user and add to a group with boto3 lib. using admin api calls:
+```sh
+import boto3
+
+client = boto3.client(
+    "cognito-idp",
+    region_name="us-east-1"
+)
+
+USER_POOL_ID = "us-east-1_XXXXXXXXX"
+
+username = "johnsmith"
+email = "john@example.com"
+preferred_username = "john"
+password = "MySecurePassword123!"
+
+# Create the user
+client.admin_create_user(
+    UserPoolId=USER_POOL_ID,
+    Username=username,
+    UserAttributes=[
+        {
+            "Name": "email",
+            "Value": email
+        },
+        {
+            "Name": "email_verified",
+            "Value": "true"
+        },
+        {
+            "Name": "preferred_username",
+            "Value": preferred_username
+        }
+    ],
+    MessageAction="SUPPRESS"  # Don't send the invitation email
+)
+
+# Set a permanent password
+client.admin_set_user_password(
+    UserPoolId=USER_POOL_ID,
+    Username=username,
+    Password=password,
+    Permanent=True
+)
+
+# Add the user to a group
+client.admin_add_user_to_group(
+    UserPoolId=USER_POOL_ID,
+    Username=username,
+    GroupName="Customers"
+)
+```
+
+
+- make "preferred username" be displayed in main page (because this field  can change)
 
 - Design service and booking workings and update RDS tables if needed
     - done. below is a full description.

@@ -1,6 +1,6 @@
 import os
 import logging
-from flask import Blueprint, redirect, render_template, request, jsonify
+from flask import Blueprint, redirect, render_template, request, jsonify # type: ignore
 
 auth_bp = Blueprint("auth", __name__)
 logger = logging.getLogger(__name__)
