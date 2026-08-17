@@ -20,7 +20,7 @@ Restart Windows and complete Ubuntu setup.
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y curl unzip git python3 python3-pip python3-venv python3-dev build-essential libpq-dev
 
-3. Install Docker (PostgreSQL + SAM runtime)
+3. Install Docker (for PostgreSQL and SAM runtime)
 sudo apt install -y docker.io
 sudo systemctl enable docker
 sudo systemctl start docker
@@ -29,6 +29,7 @@ sudo usermod -aG docker $USER
 newgrp docker
 
 docker --version
+
 4. Install AWS SAM CLI
 cd ~
 curl -Lo sam.zip https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip
@@ -80,8 +81,8 @@ mkdir -p ~/dev/freelamkt
 cd ~/dev/freelamkt
 
 rm -rf ~/dev/freelamkt/{*,.*}
-cp -r /mnt/c/Users/Work/Documents/dev/AWS-DevOps-MicroServices-FreelaMkt/local_backend/* .
-cp -r /mnt/c/Users/Work/Documents/dev/AWS-DevOps-MicroServices-FreelaMkt/backend_api .
+cp -r /mnt/c/Users/eduard/dev/AWS-DevOps-MicroServices-FreelaMkt/local_backend/* .
+cp -r /mnt/c/Users/eduard/dev/AWS-DevOps-MicroServices-FreelaMkt/backend_api .
 
 Optional check tree:
 sudo apt install tree -y
@@ -89,7 +90,7 @@ sudo apt install tree -y
 
 8. Check environment variables 
 
-Check inside local_backend/template.yaml
+Check inside template.yaml
 
 Environment:
       Variables: &default_env
@@ -125,16 +126,13 @@ sam local start-api --docker-network freela-net \
 13. Get WSL IP (for frontend access)
 hostname -I | awk '{print $1}'
 
-Example:
-172.26.123.68
-
 Test API:
-curl http://172.26.123.68:3000/api/user/healthcheck
+curl http://<API_IP>:3000/api/user/healthcheck
 or
-curl http://172.26.123.68:3000/api/service
+curl http://<API_IP>:3000/api/service
 or
 $ACCESS_TOKEN = "ACCESS TOKEN"
-curl -X GET http://172.26.123.68:3000/api/user/me `
+curl -X GET http://<API_IP>:3000/api/user/me `
   -H "Authorization: Bearer $ACCESS_TOKEN"
 
 
@@ -159,7 +157,7 @@ python run.py
 docker start freela-postgres
 
 # Start API
-cd ~/dev/freelamkt/local_backend
+cd ~/dev/freelamkt
 sam local start-api --docker-network freela-net \
   --host 0.0.0.0 --port 3000 --debug
 

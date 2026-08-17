@@ -6,11 +6,101 @@ Always zip only the files that needed to be modified to the results.zip file and
 Always change the file "appVersion" bumping the bug correction verion number by one. (example: 1.0.6 to 1.0.7)
 
 Modifications:
-    - make a centralized api library where all API's are called using the content of the .env file (variable API URL). the initial page where the api/service is called, it is always called as "http://127.0.0.1/api". 
-    - when logged in, on the my profile page, remove message "⚠ Profile editing is not yet available. This is a placeholder." and do:
-        1. get the user information from api (path: user/me). send the access token with the reqeust.
-        2. the api will send data as: {"success": true, "data": {"id": "22222222-2222-2222-2222-222222222222", "cognito_sub": "240814a8-7031-700a-cb05-afb45471d672", "email": "jsnow@edu.com", "preferred_username": "jsnow", "full_name": "John Snow", "bio": "Full Stack Dev", "avatar_key": "avatars/bob.jpg", "created_at": "2026-06-26 15:12:37.920089", "updated_at": "2026-06-29 14:41:17.097127"}}
-        3. show fields filled out with data from API aboove leaving password empty: Full Name, email, preferred username and Password and confirm password.
+    - on main page header
+        - sometimes when a user logs in, the buttons do not switch from login to logout and user profile button. fix this.
+        - the text of the show profile button currently displays user's full name. change that to display the "Preferred Username" that is retrieved from the database get user call.
+    - on My Profile page: 
+        * make email field read only
+        * remove password and confirm password fields
+        * when clicking save changes, if anything was changed make the API call to the PUT path (/api/user/me). the put function code is below
+
+PUT USER Function code:
+@app.put("/api/user/me")
+def update_user():
+    auth_error = access_validation(app, logger)
+    if auth_error:
+        return auth_error
+
+    logger.info("PUT /api/user/me request received")
+
+    cognito_sub = get_cognito_sub(app)
+    if not cognito_sub:
+        return bad_request("Missing or invalid authorization context")
+
+    try:
+        body = app.current_event.json_body
+    except Exception:
+        return bad_request("Invalid JSON body")
+
+    allowed_fields = {"preferred_username", "full_name", "bio", "avatar_key"}
+    updates = {k: v for k, v in body.items() if k in allowed_fields}
+
+    if not updates:
+        return bad_request(f"No valid fields provided. Updatable fields: {', '.join(sorted(allowed_fields))}")
+
+    if "preferred_username" in updates:
+        preferred_username = str(updates["preferred_username"]).strip()
+        if not USERNAME_RE.match(preferred_username):
+            return bad_request(
+                "preferred_username must be 3–100 characters and contain only letters, numbers, underscores, dots, or hyphens"
+            )
+        updates["preferred_username"] = preferred_username
+
+    if "full_name" in updates:
+        full_name = str(updates["full_name"]).strip()
+        if not full_name or len(full_name) > 255:
+            return bad_request("full_name must be between 1 and 255 characters")
+        updates["full_name"] = full_name
+
+    if "bio" in updates:
+        bio = updates["bio"]
+        updates["bio"] = str(bio).strip() if bio is not None else None
+
+    if "avatar_key" in updates:
+        ak = updates["avatar_key"]
+        if ak is not None:
+            ak = str(ak).strip()
+            if len(ak) > 500:
+                return bad_request("avatar_key must not exceed 500 characters")
+        updates["avatar_key"] = ak or None
+
+    def _update(cursor):
+        if "preferred_username" in updates:
+            cursor.execute(
+                "SELECT id FROM users WHERE preferred_username = %s AND cognito_sub != %s",
+                (updates["preferred_username"], cognito_sub)
+            )
+            if cursor.fetchone():
+                return conflict("preferred_username is already taken")
+
+        set_clause = ", ".join(f"{col} = %s" for col in updates.keys())
+        set_clause += ", updated_at = CURRENT_TIMESTAMP"
+        values = list(updates.values()) + [cognito_sub]
+
+        cursor.execute(
+            f"""
+            UPDATE users
+            SET {set_clause}
+            WHERE cognito_sub = %s
+            RETURNING id, cognito_sub, email, preferred_username,
+                      full_name, bio, avatar_key, created_at, updated_at
+            """,
+            values
+        )
+        row = cursor.fetchone()
+        if not row:
+            return not_found("User not found")
+        columns = [desc[0] for desc in cursor.description]
+        user = dict(zip(columns, row))
+        logger.info(f"User updated: cognito_sub={cognito_sub}")
+        return Response(
+            status_code=200,
+            content_type="application/json",
+            body=json.dumps({"success": True, "data": user}, default=str)
+        )
+
+    return db_execute(_update, logger)
+
 
 
 

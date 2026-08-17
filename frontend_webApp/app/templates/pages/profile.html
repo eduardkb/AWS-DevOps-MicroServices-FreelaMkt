@@ -18,22 +18,12 @@
 
       <div class="form-group">
         <label class="form-label" for="email">Email</label>
-        <input class="form-input" type="email" id="email" name="email" value="" />
+        <input class="form-input" type="email" id="email" name="email" value="" readonly />
       </div>
 
       <div class="form-group">
         <label class="form-label" for="preferred_username">Preferred Username</label>
         <input class="form-input" type="text" id="preferred_username" name="preferred_username" value="" />
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="password">Password</label>
-        <input class="form-input" type="password" id="password" name="password" placeholder="Leave blank to keep current password" />
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="confirm_password">Confirm Password</label>
-        <input class="form-input" type="password" id="confirm_password" name="confirm_password" placeholder="Repeat new password" />
       </div>
 
       <button class="btn-submit" type="button" id="btn-save">Save Changes</button>
@@ -85,6 +75,8 @@
       return;
     }
 
+    const originalProfile = { full_name: "", preferred_username: "" };
+
     // Fetch profile from API
     try {
       const accessToken = await Auth.getAccessToken();
@@ -106,6 +98,9 @@
       document.getElementById("email").value              = d.email || "";
       document.getElementById("preferred_username").value = d.preferred_username || "";
 
+      originalProfile.full_name           = d.full_name || "";
+      originalProfile.preferred_username  = d.preferred_username || "";
+
       document.getElementById("profile-loading").style.display = "none";
       document.getElementById("profile-fields").style.display  = "block";
 
@@ -115,6 +110,61 @@
       errEl.textContent = "Could not load profile: " + err.message;
       errEl.style.display = "block";
     }
+
+    document.getElementById("btn-save").addEventListener("click", async function () {
+      const btn = this;
+      const errEl = document.getElementById("profile-error");
+      errEl.style.display = "none";
+
+      const newFullName          = document.getElementById("fullname").value.trim();
+      const newPreferredUsername = document.getElementById("preferred_username").value.trim();
+
+      const updates = {};
+      if (newFullName !== originalProfile.full_name) {
+        updates.full_name = newFullName;
+      }
+      if (newPreferredUsername !== originalProfile.preferred_username) {
+        updates.preferred_username = newPreferredUsername;
+      }
+
+      if (Object.keys(updates).length === 0) {
+        return;
+      }
+
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "Saving...";
+
+      try {
+        const accessToken = await Auth.getAccessToken();
+        const resp = await fetch("/api/user/me", {
+          method: "PUT",
+          headers: {
+            "Authorization": "Bearer " + accessToken,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updates),
+        });
+
+        const result = await resp.json();
+
+        if (!resp.ok || !result.success || !result.data) {
+          throw new Error(result.error || "Failed to save changes");
+        }
+
+        originalProfile.full_name          = result.data.full_name || "";
+        originalProfile.preferred_username = result.data.preferred_username || "";
+        document.getElementById("fullname").value           = originalProfile.full_name;
+        document.getElementById("preferred_username").value = originalProfile.preferred_username;
+
+      } catch (err) {
+        errEl.textContent = "Could not save changes: " + err.message;
+        errEl.style.display = "block";
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    });
 
     // Show details toggle (admin only)
     const isAdmin = Array.isArray(user.groups) && user.groups.includes("admin");

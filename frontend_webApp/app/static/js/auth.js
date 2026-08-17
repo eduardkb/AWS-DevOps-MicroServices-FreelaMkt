@@ -299,7 +299,26 @@
    * Update the header to reflect the current auth state.
    * Called on DOMContentLoaded and after a successful token refresh.
    */
-  function updateHeaderUI() {
+  async function fetchPreferredUsername() {
+    try {
+      const accessToken = await getAccessToken();
+      if (!accessToken) return null;
+      const resp = await fetch("/api/user/me", {
+        headers: {
+          "Authorization": "Bearer " + accessToken,
+          "Content-Type": "application/json",
+        },
+      });
+      if (!resp.ok) return null;
+      const result = await resp.json();
+      if (!result.success || !result.data) return null;
+      return result.data.preferred_username || null;
+    } catch {
+      return null;
+    }
+  }
+
+  async function updateHeaderUI() {
     const user = getUser();
     const authenticated = isAuthenticated() && !!user;
 
@@ -307,6 +326,8 @@
     if (!authSection) return;
 
     if (authenticated) {
+      const preferredUsername = await fetchPreferredUsername();
+      const displayName = preferredUsername || user.name;
       authSection.innerHTML = `
         <a href="/auth/profile" class="btn-profile" aria-label="Profile">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
@@ -314,7 +335,7 @@
             <circle cx="12" cy="8" r="4"/>
             <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
           </svg>
-          ${escapeHtml(user.name)} Profile
+          ${escapeHtml(displayName)} Profile
         </a>
         <button class="btn-logout" aria-label="Logout" onclick="Auth.logout()">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
@@ -376,6 +397,17 @@
 
     updateHeaderUI();
     scheduleRefresh();
+  });
+
+  // Some browsers restore pages from the back/forward cache (bfcache)
+  // without re-firing DOMContentLoaded, which left the header stuck on
+  // its previous auth state. Re-sync on pageshow to cover that case.
+  window.addEventListener("pageshow", function (event) {
+    if (window.location.pathname === "/auth/callback") return;
+    updateHeaderUI();
+    if (event.persisted) {
+      scheduleRefresh();
+    }
   });
 
   // Expose public API

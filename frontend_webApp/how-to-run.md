@@ -1,4 +1,4 @@
-# Freela Marketplace — How to Run
+# Freela Marketplace — How to Run Locally
 
 ## Prerequisites
 
@@ -9,12 +9,7 @@
 
 ## 1. Extract the project
 
-Unzip the downloaded archive to a folder of your choice.
-
-```bash
-unzip freela_marketplace.zip -d freela_marketplace
-cd freela_marketplace
-```
+Extract project to local directory and enter its folder
 
 ---
 

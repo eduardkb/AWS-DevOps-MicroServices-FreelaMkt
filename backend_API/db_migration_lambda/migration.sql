@@ -106,10 +106,6 @@ BEGIN
         RAISE EXCEPTION 'email cannot be changed';
     END IF;
 
-    IF NEW.preferred_username <> OLD.preferred_username THEN
-        RAISE EXCEPTION 'preferred_username cannot be changed';
-    END IF;
-
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

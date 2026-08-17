@@ -57,10 +57,6 @@ client.admin_add_user_to_group(
     GroupName="Customers"
 )
 ```
-
-
-- make "preferred username" be displayed in main page (because this field  can change)
-
 - Design service and booking workings and update RDS tables if needed
     - done. below is a full description.
 - Code FrontEnd User section. 
