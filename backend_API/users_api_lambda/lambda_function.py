@@ -103,7 +103,7 @@ def create_user():
         return Response(
             status_code=500,
             content_type="application/json",
-            body=json.dumps({"success": False, "message": "Server misconfiguration: missing Cognito user pool"})
+            body=json.dumps({"success": False, "error": "Server misconfiguration: missing Cognito user pool"})
         )
 
     try:
@@ -198,7 +198,7 @@ def create_user():
         error_code = e.response.get("Error", {}).get("Code", "")
         if error_code == "UsernameExistsException":
             return conflict("A user with this Preferred User Name already exists")
-        message = e.response.get("Error", {}).get("Message", str(e))
+        message = e.response.get("Error", {}).get("error", str(e))
         return bad_request(f"Failed to create user account: {message}")
     except Exception as e:
         logger.exception("Unexpected error while creating Cognito user")

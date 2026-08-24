@@ -36,6 +36,7 @@
     USER: "auth_user",               // JSON-serialised { name, email, sub }
     PKCE_VERIFIER: "auth_pkce_verifier",
     PKCE_STATE: "auth_pkce_state",
+    PREFERRED_USERNAME: "auth_preferred_username",
   };
 
   // ─── Helpers ──────────────────────────────────────────────────────────────
@@ -78,6 +79,10 @@
 
   function sessionGet(key) {
     try { return sessionStorage.getItem(key); } catch { return null; }
+  }
+
+  function sessionRemove(key) {
+    sessionStorage.removeItem(key);
   }
 
   function sessionDel(key) {
@@ -326,8 +331,7 @@
     if (!authSection) return;
 
     if (authenticated) {
-      const preferredUsername = await fetchPreferredUsername();
-      const displayName = preferredUsername || user.name;
+      const displayName = _preferredUsername || "";
       authSection.innerHTML = `
         <a href="/auth/profile" class="btn-profile" aria-label="Profile">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
@@ -335,7 +339,7 @@
             <circle cx="12" cy="8" r="4"/>
             <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
           </svg>
-          ${escapeHtml(displayName)} Profile
+          ${displayName ? `${escapeHtml(displayName)} ` : ""}Profile
         </a>
         <button class="btn-logout" aria-label="Logout" onclick="Auth.logout()">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
@@ -344,6 +348,21 @@
           </svg>
           Logout
         </button>`;
+      
+      if (!_preferredUsername) {
+        fetchPreferredUsername().then(function(username) {
+          if (username && username !== _preferredUsername) {
+              _preferredUsername = username;
+
+              sessionSet(
+                  STORAGE_KEYS.PREFERRED_USERNAME,
+                  username
+              );
+
+              updateHeaderUI();
+          }
+        });
+      }
     } else {
       authSection.innerHTML = `
         <a href="/auth/register" class="btn-register" aria-label="Create Account">
@@ -410,6 +429,36 @@
     }
   });
 
+  // Track preferred username for header updates
+  let _preferredUsername = sessionGet(STORAGE_KEYS.PREFERRED_USERNAME);
+
+  function setPreferredUsername(username) {
+    if (username === _preferredUsername) {
+        return;
+    }
+
+    _preferredUsername = username;
+
+    sessionSet(
+        STORAGE_KEYS.PREFERRED_USERNAME,
+        username
+    );
+
+    updateHeaderUI();
+  }
+
+  function getPreferredUsername() {
+    return _preferredUsername;
+  }
+
   // Expose public API
-  global.Auth = { isAuthenticated, getUser, getAccessToken, login, logout };
+  global.Auth = { 
+    isAuthenticated, 
+    getUser, 
+    getAccessToken, 
+    login, 
+    logout,
+    setPreferredUsername,
+    getPreferredUsername
+  };
 })(window);

@@ -8,7 +8,6 @@
     <p class="form-subtitle">Your account information</p>
 
     <div id="profile-loading" style="color: var(--color-muted, #6b7280); font-size: 0.9rem; margin-bottom: 1rem;">Loading profile…</div>
-    <div id="profile-error" style="display:none; color: #ef4444; font-size: 0.875rem; margin-bottom: 1rem;"></div>
 
     <div id="profile-fields" style="display:none;">
       <div class="form-group">
@@ -106,15 +105,11 @@
 
     } catch (err) {
       document.getElementById("profile-loading").style.display = "none";
-      const errEl = document.getElementById("profile-error");
-      errEl.textContent = "Could not load profile: " + err.message;
-      errEl.style.display = "block";
+      MessageBus.error(err.message);
     }
 
     document.getElementById("btn-save").addEventListener("click", async function () {
       const btn = this;
-      const errEl = document.getElementById("profile-error");
-      errEl.style.display = "none";
 
       const newFullName          = document.getElementById("fullname").value.trim();
       const newPreferredUsername = document.getElementById("preferred_username").value.trim();
@@ -146,10 +141,11 @@
           body: JSON.stringify(updates),
         });
 
-        const result = await resp.json();
+        const result = await resp.json();        
 
         if (!resp.ok || !result.success || !result.data) {
-          throw new Error(result.error || "Failed to save changes");
+          const apiErrorMsg = result.error || "Failed to save changes";
+          throw new Error(apiErrorMsg);
         }
 
         originalProfile.full_name          = result.data.full_name || "";
@@ -157,9 +153,15 @@
         document.getElementById("fullname").value           = originalProfile.full_name;
         document.getElementById("preferred_username").value = originalProfile.preferred_username;
 
+        // Update header username if it changed
+        if (updates.preferred_username) {
+          Auth.setPreferredUsername(result.data.preferred_username);
+        }
+
+        MessageBus.success("Profile updated successfully");
+
       } catch (err) {
-        errEl.textContent = "Could not save changes: " + err.message;
-        errEl.style.display = "block";
+        MessageBus.error(err.message);
       } finally {
         btn.disabled = false;
         btn.textContent = originalText;
@@ -207,7 +209,7 @@
           } catch (err) {
             document.getElementById("api-params-loading").style.display = "none";
             document.getElementById("api-params-error").style.display = "block";
-            document.getElementById("api-params-error").textContent = "Error fetching API parameters: " + err.message;
+            document.getElementById("api-params-error").textContent = err.message;
           }
         }
       } else {

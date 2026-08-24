@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor">
+  <defs>
+    <linearGradient id="marketGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Storefront base -->
+  <rect x="20" y="80" width="216" height="140" rx="12" fill="url(#marketGrad)" opacity="0.1" stroke="url(#marketGrad)" stroke-width="2"/>
+  
+  <!-- Left shop window -->
+  <rect x="30" y="95" width="70" height="65" rx="6" fill="none" stroke="url(#marketGrad)" stroke-width="2"/>
+  <circle cx="45" cy="110" r="8" fill="url(#marketGrad)"/>
+  <circle cx="75" cy="125" r="6" fill="url(#marketGrad)"/>
+  <rect x="50" y="140" width="35" height="10" rx="2" fill="url(#marketGrad)" opacity="0.6"/>
+  
+  <!-- Middle shop window -->
+  <rect x="108" y="95" width="70" height="65" rx="6" fill="none" stroke="url(#marketGrad)" stroke-width="2"/>
+  <path d="M130 115 L148 105 L150 125 Z" fill="url(#marketGrad)" opacity="0.7"/>
+  <rect x="125" y="140" width="35" height="10" rx="2" fill="url(#marketGrad)" opacity="0.6"/>
+  
+  <!-- Right shop window -->
+  <rect x="186" y="95" width="70" height="65" rx="6" fill="none" stroke="url(#marketGrad)" stroke-width="2"/>
+  <circle cx="210" cy="120" r="8" fill="url(#marketGrad)"/>
+  <rect x="200" y="140" width="35" height="10" rx="2" fill="url(#marketGrad)" opacity="0.6"/>
+  
+  <!-- Door -->
+  <rect x="108" y="165" width="40" height="50" rx="4" fill="none" stroke="url(#marketGrad)" stroke-width="2"/>
+  <circle cx="143" cy="190" r="3" fill="url(#marketGrad)"/>
+  
+  <!-- Roof -->
+  <polygon points="20,80 128,20 236,80" fill="url(#marketGrad)" opacity="0.15" stroke="url(#marketGrad)" stroke-width="2"/>
+  
+  <!-- Flag on roof -->
+  <rect x="125" y="15" width="2" height="20" fill="url(#marketGrad)"/>
+  <polygon points="127,18 127,25 138,22" fill="url(#marketGrad)"/>
+  
+  <!-- Shopping bags below -->
+  <g transform="translate(0, 180)">
+    <!-- Left bag -->
+    <path d="M 35 20 L 40 0 L 55 0 L 60 20 Z" fill="none" stroke="url(#marketGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="40" y1="20" x2="55" y2="20" stroke="url(#marketGrad)" stroke-width="2"/>
+    
+    <!-- Right bag -->
+    <path d="M 185 20 L 190 0 L 205 0 L 210 20 Z" fill="none" stroke="url(#marketGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="190" y1="20" x2="205" y2="20" stroke="url(#marketGrad)" stroke-width="2"/>
+  </g>
+</svg>

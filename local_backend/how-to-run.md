@@ -154,14 +154,14 @@ python run.py
 16. Restart DB and API
 
 # Start DB
-docker start freela-postgres
+  docker start freela-postgres
 
 # Start API
 cd ~/dev/freelamkt
 sam local start-api --docker-network freela-net \
   --host 0.0.0.0 --port 3000 --debug
 
-# During development rebuild and restart
+# During development rebuild and restart (copy files first)
 sam build --cached && \
 sam local start-api --debug \
 --docker-network freela-net \

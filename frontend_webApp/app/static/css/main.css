@@ -127,6 +127,52 @@ body {
   border-top: 1px solid var(--border);
 }
 
+/* ── MESSAGE BANNER ────────────────────────────── */
+.message-banner {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  animation: slideDown 0.3s ease forwards;
+  border-bottom: 1px solid var(--border);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-banner--info {
+  background: rgba(45, 125, 210, 0.1);
+  color: var(--blue-glow);
+  border-bottom-color: rgba(45, 125, 210, 0.3);
+}
+
+.message-banner--success {
+  background: rgba(0, 200, 120, 0.1);
+  color: #00e091;
+  border-bottom-color: rgba(0, 200, 120, 0.3);
+}
+
+.message-banner--warning {
+  background: rgba(255, 193, 7, 0.1);
+  color: #ffc107;
+  border-bottom-color: rgba(255, 193, 7, 0.3);
+}
+
+.message-banner--error {
+  background: rgba(220, 60, 60, 0.1);
+  color: #ff8a8a;
+  border-bottom-color: rgba(220, 60, 60, 0.3);
+}
+
 .nav-inner {
   max-width: 1280px;
   margin: 0 auto;
