@@ -7,7 +7,13 @@
     <h1 class="form-title">My Profile</h1>
     <p class="form-subtitle">Your account information</p>
 
-    <div id="profile-loading" style="color: var(--color-muted, #6b7280); font-size: 0.9rem; margin-bottom: 1rem;">Loading profile…</div>
+    <div id="profile-loading" style="color: var(--color-muted, #6b7280); font-size: 0.9rem; margin-bottom: 1rem;">
+      Loading profile…
+    </div>
+
+    <div id="profile-error"
+        style="display:none; color:#ef4444; font-size:0.9rem; margin-bottom:1rem;">
+    </div>
 
     <div id="profile-fields" style="display:none;">
       <div class="form-group">
@@ -68,7 +74,7 @@
 {% block extra_js %}
 <script>
   document.addEventListener("DOMContentLoaded", async function () {
-    const user = Auth.getUser();
+    const user = Auth.getUser();    
     if (!user) {
       window.location.replace("/auth/login");
       return;
@@ -88,7 +94,8 @@
 
       const result = await resp.json();
 
-      if (!result.success || !result.data) {
+      
+      if (!result.success || !result.data) {        
         throw new Error(result.error || "Unexpected API response");
       }
 
@@ -104,8 +111,18 @@
       document.getElementById("profile-fields").style.display  = "block";
 
     } catch (err) {
-      document.getElementById("profile-loading").style.display = "none";
-      MessageBus.error(err.message);
+        console.error("Failed to retrieve user profile:", err);
+
+        document.getElementById("profile-loading").style.display = "none";
+
+        const errorElement = document.getElementById("profile-error");
+
+        errorElement.textContent =
+          "User details could not be retrieved. Is the user confirmed by an admin?";
+
+        errorElement.style.display = "block";
+
+        document.getElementById("profile-fields").style.display = "none";
     }
 
     document.getElementById("btn-save").addEventListener("click", async function () {
