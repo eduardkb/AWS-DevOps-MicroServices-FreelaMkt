@@ -1,92 +1,43 @@
-API Test CURL:
-curl -X GET "https://www.edukb.site/api/user/getparam" `
-  -H "Authorization: Bearer XXXXX" `
-  -H "x-cloudfront-secret: XXXXX"
-====
-- make site have a global messaging system. all messages displayed below the main page bar.
 
-- Create user and add to a group with boto3 lib. using admin api calls:
-```sh
-import boto3
 
-client = boto3.client(
-    "cognito-idp",
-    region_name="us-east-1"
-)
-
-USER_POOL_ID = "us-east-1_XXXXXXXXX"
-
-username = "johnsmith"
-email = "john@example.com"
-preferred_username = "john"
-password = "MySecurePassword123!"
-
-# Create the user
-client.admin_create_user(
-    UserPoolId=USER_POOL_ID,
-    Username=username,
-    UserAttributes=[
-        {
-            "Name": "email",
-            "Value": email
-        },
-        {
-            "Name": "email_verified",
-            "Value": "true"
-        },
-        {
-            "Name": "preferred_username",
-            "Value": preferred_username
-        }
-    ],
-    MessageAction="SUPPRESS"  # Don't send the invitation email
-)
-
-# Set a permanent password
-client.admin_set_user_password(
-    UserPoolId=USER_POOL_ID,
-    Username=username,
-    Password=password,
-    Permanent=True
-)
-
-# Add the user to a group
-client.admin_add_user_to_group(
-    UserPoolId=USER_POOL_ID,
-    Username=username,
-    GroupName="Customers"
-)
-```
-- Design service and booking workings and update RDS tables if needed
-    - done. below is a full description.
+- add "COGNITO_REGION" to frontend env variables
+- add to pre-work documentation: enable Self-service sign-up on cognito. inside self-service menu item00
 - Code FrontEnd User section. 
-    - create user in cognito
+    - user creation notes
+        - create user in AWS Cognito (call API from browser)
+            - cognito  post confirmation trigger does
+                - add user to group
+                - creates user in RDB
+        - if successfully created
+            - get "cognito_sub" returned from creation
+            - create user in RDS with a additional field "cognito_sub" to relate both entities.
+            - if successful
+                - return user created
+            - else
+                - delete user from cognito
+                - return user creation failure message
+        - else return failure message
     - join cognito with user table using "cognito_sub" parameter
     - follow user creation logic below
     - implement modify user (PUT)
 - Code frontend Service section
 - Code frontend Booking 
-
 - continue with phase 9 and 10
 
 
-- is there a resource without tags / default name?
+
+- in AWS is there a resource without tags / default name?
 - make network diagram of project and store in architecture folder and reference in architecture.md file
-- user creation notes
-    - create user in AWS Cognito
-    - if successfully created
-        - get "cognito_sub" returned from creation
-        - create user in RDS with a additional field "cognito_sub" to relate both entities.
-        - if successful
-            - return user created
-        - else
-            - delete user from cognito
-            - return user creation failure message
-    - else return failure message
+
 
 
 ========================================
-- Annotation: Lambda API's created:
+API Test CURL:
+    curl -X GET "https://www.edukb.site/api/user/getparam" `
+    -H "Authorization: Bearer XXXXX" `
+    -H "x-cloudfront-secret: XXXXX"
+    
+- API notes: Lambda API's created:
     user
         POST   /user
         GET    /user/me

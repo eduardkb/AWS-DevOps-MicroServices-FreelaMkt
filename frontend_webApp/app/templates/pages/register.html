@@ -2,38 +2,327 @@
 {% block title %} - Create Account{% endblock %}
 
 {% block content %}
-<div class="form-page">
+<div class="form-page" data-cognito-client-id="{{ cognito_client_id }}" data-cognito-region="{{ cognito_region }}">
   <div class="form-card">
     <h1 class="form-title">Create Account</h1>
     <p class="form-subtitle">Join Freela Marketplace</p>
 
     <div class="form-group">
       <label class="form-label" for="fullname">Full Name</label>
-      <input class="form-input" type="text" id="fullname" name="fullname" placeholder="Your full name" disabled />
+      <input
+        class="form-input"
+        type="text"
+        id="fullname"
+        name="fullname"
+        placeholder="Your full name"
+        autocomplete="name"
+      />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="username">User Name</label>
+      <input
+        class="form-input"
+        type="text"
+        id="username"
+        name="username"
+        placeholder="Your user name"
+        autocomplete="username"
+        maxlength="14"
+      />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="phonenumber">Phone Number</label>
+      <input
+        class="form-input"
+        type="text"
+        id="phonenumber"
+        name="phonenumber"
+        placeholder="Your phone number"
+        autocomplete="phonenumber"
+        maxlength="14"
+      />
     </div>
 
     <div class="form-group">
       <label class="form-label" for="email">Email</label>
-      <input class="form-input" type="email" id="email" name="email" placeholder="you@example.com" disabled />
+      <input
+        class="form-input"
+        type="email"
+        id="email"
+        name="email"
+        placeholder="you@example.com"
+        autocomplete="email"
+      />
     </div>
 
     <div class="form-group">
       <label class="form-label" for="password">Password</label>
-      <input class="form-input" type="password" id="password" name="password" placeholder="••••••••" disabled />
+      <input
+        class="form-input"
+        type="password"
+        id="password"
+        name="password"
+        placeholder="••••••••"
+        autocomplete="new-password"
+        maxlength="30"
+      />
     </div>
 
     <div class="form-group">
-      <label class="form-label" for="confirm_password">Confirm Password</label>
-      <input class="form-input" type="password" id="confirm_password" name="confirm_password" placeholder="••••••••" disabled />
+      <label class="form-label" for="confirm_password">
+        Confirm Password
+      </label>
+
+      <input
+        class="form-input"
+        type="password"
+        id="confirm_password"
+        name="confirm_password"
+        placeholder="••••••••"
+        autocomplete="new-password"
+        maxlength="30"
+      />
     </div>
 
-    <button class="btn-submit" type="button" disabled>Create Account</button>
+    <button
+      class="btn-submit"
+      id="create-account-button"
+      type="button"
+    >
+      Create Account
+    </button>
 
     <p class="form-footer">
-      Already have an account? <a href="{{ url_for('auth.login') }}">Login</a>
+      Already have an account?
+      <a href="{{ url_for('auth.login') }}">Login</a>
     </p>
-
-    <p class="form-placeholder-notice">⚠ Registration is not yet available. This is a placeholder.</p>
   </div>
 </div>
+
+<script>
+  const page = document.querySelector(".form-page");
+  const COGNITO_CLIENT_ID = page.dataset.cognitoClientId;
+  const COGNITO_REGION = page.dataset.cognitoRegion;
+  const fullnameInput = document.getElementById("fullname");
+  const usernameInput = document.getElementById("username");
+  const emailInput = document.getElementById("email");
+  const phoneInput = document.getElementById("phonenumber");
+  const passwordInput = document.getElementById("password");
+  const confirmPasswordInput = document.getElementById("confirm_password");
+  const createAccountButton = document.getElementById("create-account-button");  
+
+  function validateFullName(fullname) {
+    const value = fullname.trim();
+
+    if (value.length <= 4 || value.length > 30) {
+      return "Full name must contain between 5 and 30 characters.";
+    }
+
+    return null;
+  }
+  function validateUsername(username) {
+    const value = username.trim();
+    const usernameRegex = /^[A-Za-z][A-Za-z0-9_.]{4,14}$/;
+
+    if (!usernameRegex.test(value)) {
+      return (
+        "Username must be 5-15 characters, start with a letter, " +
+        "and contain only letters, numbers, '_' or '.'."
+      );
+    }
+
+    return null;
+  }
+  function validateEmail(email) {
+    const value = email.trim();
+
+    /*
+     * Reasonably strict browser-side email validation.
+     * Cognito will perform its own validation as well.
+     */
+    const emailRegex =
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(value)) {
+      return "Please enter a valid email address.";
+    }
+
+    return null;
+  }
+  function validatePhoneNumber(phonenumber) {
+    const value = phonenumber.trim();
+    const phoneNumberRegex = /^\+[1-9]\d{1,14}$/;
+
+    if (!phoneNumberRegex.test(value)) {
+      return (
+        "Phone number must be in E.164 format (+5541999887766)"        
+      );
+    }
+
+    return null;
+  }
+  function validatePassword(password) {
+    /*
+     * 5-30 characters.
+     *
+     * Allows printable ASCII characters, including:
+     * letters
+     * numbers
+     * ! @ # $ % ^ & * ( ) etc.
+     *
+     * Spaces are intentionally not allowed.
+     */
+    const passwordRegex = /^[\x21-\x7E]{5,30}$/;
+
+    if (!passwordRegex.test(password)) {
+      return (
+        "Password must contain 5-30 characters and may contain " +
+        "letters, numbers, and common special characters."
+      );
+    }
+
+    return null;
+  }
+  function validateForm() {
+    const fullname = fullnameInput.value;
+    const username = usernameInput.value;
+    const email = emailInput.value;
+    const phoneNumber = phoneInput.value;
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
+
+    let error;
+
+    error = validateFullName(fullname);
+    if (error) {
+      return error;
+    }
+
+    error = validateUsername(username);
+    if (error) {
+      return error;
+    }
+
+    error = validateEmail(email);
+    if (error) {
+      return error;
+    }
+
+    error = validatePhoneNumber(phoneNumber);
+    if (error) {
+      return error;
+    }
+
+    error = validatePassword(password);
+    if (error) {
+      return error;
+    }
+
+    if (password !== confirmPassword) {
+      return "Passwords do not match.";
+    }
+
+    return null;
+  }
+  async function registerUser() {
+    const validationError = validateForm();
+
+    if (validationError) {
+      console.log("error:",validationError);
+      MessageBus.error(`Validation error: ${validationError}`);
+      return;
+    }
+
+    const fullname = fullnameInput.value.trim();
+    const username = usernameInput.value.trim();
+    const email = emailInput.value.trim();
+    const phoneNumber = phoneInput.value.trim();
+    const password = passwordInput.value;
+
+    createAccountButton.disabled = true;
+    createAccountButton.textContent = "Creating Account...";
+
+    try {
+      const cognitoEndpoint =
+        `https://cognito-idp.${COGNITO_REGION}.amazonaws.com/`;
+
+      const requestBody = {
+        ClientId: COGNITO_CLIENT_ID,
+        Username: username,
+        Password: password,
+
+        UserAttributes: [
+          {
+            Name: "name",
+            Value: fullname
+          },
+          {
+            Name: "preferred_username",
+            Value: username
+          },
+          {
+            Name: "phone_number",
+            Value: phoneNumber
+          },
+          {
+            Name: "email",
+            Value: email
+          }
+        ]
+      };
+
+      const response = await fetch(cognitoEndpoint, {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/x-amz-json-1.1",
+          "X-Amz-Target":
+            "AWSCognitoIdentityProviderService.SignUp"
+        },
+
+        body: JSON.stringify(requestBody)
+      });
+
+      const result = await response.json();
+
+      // Log the complete Cognito response.
+      console.log("Cognito SignUp response:", result);
+      console.log("Cognito HTTP status:", response.status);
+
+      console.log("DEB: STATUS:", response.status);
+      console.log("DEB: OK:", response.ok);
+      console.log("DEB: STATUS TYPE:", typeof response.status);
+
+
+      if (!response.ok || response.status !== 200) {
+        const errorMessage =
+          result.message ||
+          result.Message ||
+          "Failed to create account.";
+
+        throw new Error(errorMessage);
+      }
+
+      // Clear sensitive password fields from the browser.
+      passwordInput.value = "";
+      confirmPasswordInput.value = "";
+
+      MessageBus.success("Account created Successfully. Wait for account confirmation then login.");
+    } catch (error) {
+      console.error("Cognito SignUp", error);
+      MessageBus.error(`Cognito SignUp ${error}`);      
+    } finally {
+      createAccountButton.disabled = false;
+      createAccountButton.textContent = "Create Account";      
+    }
+  }
+
+
+  createAccountButton.addEventListener(
+    "click",
+    registerUser
+  );
+</script>
 {% endblock %}

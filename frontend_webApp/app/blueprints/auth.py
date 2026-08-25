@@ -58,7 +58,8 @@ def logout():
 
 @auth_bp.route("/register")
 def register():
-    return render_template("pages/register.html", active_tab="")
+    return render_template("pages/register.html", active_tab="",cognito_client_id=os.getenv("COGNITO_CLIENT_ID"),
+        cognito_region=os.getenv("COGNITO_REGION", "us-east-1"))
 
 
 @auth_bp.route("/profile")
